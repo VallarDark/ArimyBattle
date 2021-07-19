@@ -4,13 +4,13 @@ namespace ArmyBattle.Skills
 {
     using Abstraction;
 
-    class DefAura:StrangerSkill
+    class DamageAura : StrangerSkill
     {
-        public DefAura( List<Warrior> targets) : base( targets)
+        public DamageAura( List<Warrior> targets) : base( targets)
         {
             Range = 2;
             Strange = 5;
-            ActionType = ActionTypeEnum.Buff;
+            ActionType = ActionTypeEnum.Debuff;
             CountType = CountTypeEnum.Many;
         }
 
@@ -18,7 +18,7 @@ namespace ArmyBattle.Skills
         {
             foreach (var target in GetTarget())
             {
-                target.Def += Strange;
+                target.Hp -= 30;
             }
         }
 

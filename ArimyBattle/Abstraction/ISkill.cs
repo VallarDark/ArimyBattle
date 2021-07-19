@@ -2,6 +2,7 @@
 {
     public interface ISkill
     {
-        public void UseSkill(Warrior caster, params Warrior[] targets);
+        public int Strange { get; set; }
+        public void UseSkill(Warrior caster);
     }
 }

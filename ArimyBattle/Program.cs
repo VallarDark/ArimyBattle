@@ -1,19 +1,17 @@
-﻿using System;
-using System.Numerics;
-using ArmyBattle.Warriors;
-using ArmyBattle.WarriorsDraw;
-
-namespace ArmyBattle
+﻿namespace ArmyBattle
 {
+    using System.Numerics;
+    using Army;
+    using Warriors;
+
     class Program
     {
         static void Main()
         {
-            var sm = new Swordsman(new Vector2(0, 0), 1);
-            sm.Draw();
-
-            sm.Hp -= 116;
-            sm.Draw();
+            var battle = new Battle();
+            battle.AddWarrior(new Swordsman(Vector2.Zero, 1));
+            battle.AddWarrior(new Swordsman(new Vector2(3,3), 2));
+            battle.Start();
         }
     }
 }

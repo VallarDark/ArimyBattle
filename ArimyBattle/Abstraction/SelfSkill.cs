@@ -2,6 +2,8 @@
 {
     public abstract class SelfSkill : ISkill
     {
-        public abstract void UseSkill(Warrior caster, params Warrior[] targets);
+        public int Strange { get; set; }
+        public abstract void UseSkill(Warrior caster);
+
     }
 }
