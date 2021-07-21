@@ -23,6 +23,7 @@ namespace ArmyBattle.Abstraction
         protected CountTypeEnum CountType { get; set; }
         public int Range { get; set; }
         public int Strange { get; set; }
+        public ISkill InnerSkill { get; set; }
         public List<Warrior> Targets { get; set; }
         public Warrior Caster { get; set; }
 
@@ -54,7 +55,10 @@ namespace ArmyBattle.Abstraction
             }
         }
 
-        public abstract void UseSkill(Warrior caster);
+        public virtual void UseSkill(Warrior caster)
+        {
+            InnerSkill.UseSkill(caster);
+        }
 
     }
 }

@@ -7,9 +7,20 @@ namespace ArmyBattle.Abstraction
     using System;
     public abstract class Warrior : IWarrior
     {
-        protected bool HasAction;
         protected Random Random;
-        protected int AttackCounter;
+
+        protected bool HasAction;
+        protected bool IsAlive;
+        protected int AttackCounter;    // timer to reset action       
+        protected int DieCounter;       // rounds count before clear dead warrior
+
+        protected readonly int BaseHp;
+        protected readonly int BaseDef;
+        protected readonly int BaseAttackPower;
+        protected readonly int BaseAttackRange;
+        protected readonly int BaseAttackResetTime;
+        protected readonly int BaseCommandNumber;
+
         public List<Warrior> AllUnits { get; set; }
         public Vector2 Position { get; set; }
         public int CommandNumber { get; set; }
@@ -22,8 +33,41 @@ namespace ArmyBattle.Abstraction
         public List<Type> DominanceWarriors { get; protected set; }
         public List<Type> SuppressionWarriors { get; protected set; }
 
+        public void ResetHp()
+        {
+            Hp = BaseHp;
+        }
+
+        public void ResetDef()
+        {
+            Def = BaseDef;
+        }
+
+        public void ResetAttackPower()
+        {
+            AttackPower = BaseAttackPower;
+        }
+
+        public void ResetAttackRange()
+        {
+            AttackRange = BaseAttackRange;
+        }
+
+        public void ResetAttackResetTime()
+        {
+            AttackResetTime = BaseAttackResetTime;
+        }
+
+        public void ResetCommandNumber()
+        {
+            CommandNumber = BaseCommandNumber;
+        }
+
         protected Warrior(List<Warrior> allUnits, Vector2 position, int commandNumber, int hp, int def, int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors)
         {
+            IsAlive = true;
+            DieCounter = 10;
+
             AllUnits = allUnits;
             Position = position;
             CommandNumber = commandNumber;
@@ -35,12 +79,23 @@ namespace ArmyBattle.Abstraction
             Skill = skill;
             DominanceWarriors = dominanceWarriors;
             SuppressionWarriors = suppressionWarriors;
+
+            BaseCommandNumber = commandNumber;
+            BaseHp = hp;
+            BaseDef = def;
+            BaseAttackPower = attackPower;
+            BaseAttackRange = attackRange;
+            BaseAttackResetTime = attackResetTime;
         }
 
         protected Warrior(Vector2 position, int commandNumber)
         {
+            IsAlive = true;
+
             Position = position;
             CommandNumber = commandNumber;
+
+            BaseCommandNumber = commandNumber;
         }
 
         protected virtual int CalculateAttackPower(Warrior target)
@@ -83,40 +138,44 @@ namespace ArmyBattle.Abstraction
 
         public void Action()
         {
-            if (!HasAction)
+            if (IsAlive)
             {
-                HpCheck();
-                var target = GetTarget();
-                if (target != null)
+                if (!HasAction)
                 {
-                    Attack(target);
-                    HasAction = true;
-                }
-                else
-                {
-                    var newPosition = new Vector2(Random.Next(-1, 1), Random.Next(-1, 1));
-                    var neighbor = AllUnits.FirstOrDefault(u =>
-                        Vector2.Distance(Position + newPosition, u.Position) <= 0.5 && u != this);
-                    if (neighbor != null)
+                    HpCheck();
+                    var target = GetTarget();
+                    if (target != null)
                     {
-                        Rearrangement(neighbor);
+                        Attack(target);
+                        HasAction = true;
                     }
                     else
                     {
-                        Position += newPosition;
-                    }
-                    HasAction = false;
-                }
-            }
-            else
-            {
-                if (AttackCounter<=0)
-                {
-                    AttackCounter = AttackResetTime;
-                    HasAction = false;
-                }
+                        var newPosition = new Vector2(Random.Next(-1, 1), Random.Next(-1, 1));
+                        var neighbor = AllUnits.FirstOrDefault(u =>
+                            Vector2.Distance(Position + newPosition, u.Position) <= 0.5 && u != this);
+                        if (neighbor != null)
+                        {
+                            Rearrangement(neighbor);
+                        }
+                        else
+                        {
+                            Position += newPosition;
+                        }
 
-                AttackCounter--;
+                        HasAction = false;
+                    }
+                }
+                else
+                {
+                    if (AttackCounter <= 0)
+                    {
+                        AttackCounter = AttackResetTime;
+                        HasAction = false;
+                    }
+
+                    AttackCounter--;
+                }
             }
         }
 
@@ -132,7 +191,7 @@ namespace ArmyBattle.Abstraction
         {
             if (Hp <= 0)
             {
-                AllUnits.Remove(this);
+                IsAlive = false;
             }
         }
 

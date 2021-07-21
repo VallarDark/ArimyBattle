@@ -3,7 +3,12 @@
     public abstract class SelfSkill : ISkill
     {
         public int Strange { get; set; }
-        public abstract void UseSkill(Warrior caster);
+        public ISkill InnerSkill { get; set; }
+
+        public virtual void UseSkill(Warrior caster)
+        {
+            InnerSkill.UseSkill(caster);
+        }
 
     }
 }

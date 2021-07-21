@@ -20,6 +20,8 @@ namespace ArmyBattle.Skills
             {
                 target.Hp -= 30;
             }
+
+            base.UseSkill(caster);
         }
 
     }

@@ -43,9 +43,12 @@
 
         public void AddWarrior(Warrior newWarrior)
         {
-            var sameType = _prototypes.First(p => p.GetType() == newWarrior.GetType());
-            var result = sameType.GetInstance(newWarrior.Position, newWarrior.CommandNumber);
-            _warriors.Add(result);
+            var sameType = _prototypes.FirstOrDefault(p => p.GetType() == newWarrior.GetType());
+            if (sameType != null)
+            {
+                var result = sameType.GetInstance(newWarrior.Position, newWarrior.CommandNumber);
+                _warriors.Add(result);
+            }
         }
 
         private void StartRound(object sender, ElapsedEventArgs e)

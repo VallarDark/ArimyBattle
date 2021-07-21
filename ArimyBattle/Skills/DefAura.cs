@@ -20,6 +20,8 @@ namespace ArmyBattle.Skills
             {
                 target.Def += Strange;
             }
+
+            base.UseSkill(caster);
         }
 
     }
