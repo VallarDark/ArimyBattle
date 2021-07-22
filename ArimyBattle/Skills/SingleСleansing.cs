@@ -2,23 +2,22 @@
 {
     using Abstraction;
     using System.Collections.Generic;
-
-    class DefAura:StrangerSkill
+    class SingleСleansing : StrangerSkill
     {
-        public DefAura(Warrior caster, List<Warrior> targets, ISkill innerSkill = null) : base(caster, targets, innerSkill)
+        public SingleСleansing(Warrior caster, List<Warrior> targets, ISkill innerSkill = null) : base(caster, targets,
+            innerSkill)
         {
-            Strange = 5;
             RollbackTime = 3;
             CastTime = 2;
 
             ActionType = ActionTypeEnum.Buff;
-            CountType = CountTypeEnum.Many;
+            CountType = CountTypeEnum.Single;
 
             SkillFunk = (warrior) =>
             {
                 foreach (var target in GetTarget())
                 {
-                    target.Def += Strange;
+                    target.ResetCharacteristics();
                 }
             };
         }

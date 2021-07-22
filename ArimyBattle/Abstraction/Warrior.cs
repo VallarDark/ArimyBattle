@@ -19,16 +19,81 @@ namespace ArmyBattle.Abstraction
         protected readonly int BaseAttackPower;
         protected readonly int BaseAttackRange;
         protected readonly int BaseAttackResetTime;
-        protected readonly int BaseCommandNumber;
+        protected readonly int BaseTeamNumber;
 
-        public List<Warrior> AllUnits { get; set; }
+        protected int InnerHp;
+        protected int InnerDef;
+        protected int InnerAttackPower;
+        protected int InnerAttackRange;
+        protected int InnerAttackResetTime;
+        protected int InnerTeamNumber;
+
+        public int TeamNumber
+        {
+            get => InnerTeamNumber;
+            set
+            {
+                if (value>=0)
+                {
+                    InnerTeamNumber = value;
+                }
+            }
+        }
+        public int Hp
+        {
+            get => InnerHp;
+            set
+            {
+                if (value >= 0 && value<=BaseHp)
+                {
+                    InnerHp = value;
+                }
+            }
+        }
+        public int Def {
+            get => InnerDef;
+            set
+            {
+                if (value >= 0)
+                {
+                    InnerDef = value;
+                }
+            }
+        }
+        public int AttackPower {
+            get => InnerAttackPower;
+            set
+            {
+                if (value >= 0)
+                {
+                    InnerAttackPower = value;
+                }
+            }
+        }
+        public int AttackRange {
+            get => InnerAttackRange;
+            set
+            {
+                if (value >= 0)
+                {
+                    InnerAttackRange = value;
+                }
+            }
+        }
+        public int AttackResetTime {
+            get => InnerAttackResetTime;
+            set
+            {
+                if (value >= 0)
+                {
+                    InnerAttackResetTime = value;
+                }
+            }
+        }
+
         public Vector2 Position { get; set; }
-        public int CommandNumber { get; set; }
-        public int Hp { get; set; }
-        public int Def { get; set; }
-        public int AttackPower { get; set; }
-        public int AttackRange { get; set; }
-        public int AttackResetTime { get; set; }
+
+        public List<Warrior> AllUnits { get; protected set; }
         public ISkill Skill { get; protected set; }
         public List<Type> DominanceWarriors { get; protected set; }
         public List<Type> SuppressionWarriors { get; protected set; }
@@ -38,39 +103,55 @@ namespace ArmyBattle.Abstraction
             Hp = BaseHp;
         }
 
-        public void ResetDef()
+        protected void ResetDef()
         {
             Def = BaseDef;
         }
 
-        public void ResetAttackPower()
+        protected void ResetAttackPower()
         {
             AttackPower = BaseAttackPower;
         }
 
-        public void ResetAttackRange()
+        protected void ResetAttackRange()
         {
             AttackRange = BaseAttackRange;
         }
 
-        public void ResetAttackResetTime()
+        protected void ResetAttackResetTime()
         {
             AttackResetTime = BaseAttackResetTime;
         }
 
-        public void ResetCommandNumber()
+        protected void ResetCommandNumber()
         {
-            CommandNumber = BaseCommandNumber;
+            TeamNumber = BaseTeamNumber;
         }
 
-        protected Warrior(List<Warrior> allUnits, Vector2 position, int commandNumber, int hp, int def, int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors)
+        public void ResetCharacteristics()
         {
+            ResetDef();
+            ResetAttackPower();
+            ResetAttackRange();
+            ResetAttackResetTime();
+            ResetCommandNumber();
+        }
+
+        protected Warrior(List<Warrior> allUnits, Vector2 position, int teamNumber, int hp, int def, int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors)
+        {
+            BaseTeamNumber = teamNumber;
+            BaseHp = hp;
+            BaseDef = def;
+            BaseAttackPower = attackPower;
+            BaseAttackRange = attackRange;
+            BaseAttackResetTime = attackResetTime;
+
             IsAlive = true;
             DieCounter = 10;
 
             AllUnits = allUnits;
             Position = position;
-            CommandNumber = commandNumber;
+            TeamNumber = teamNumber;
             Hp = hp;
             Def = def;
             AttackPower = attackPower;
@@ -80,22 +161,16 @@ namespace ArmyBattle.Abstraction
             DominanceWarriors = dominanceWarriors;
             SuppressionWarriors = suppressionWarriors;
 
-            BaseCommandNumber = commandNumber;
-            BaseHp = hp;
-            BaseDef = def;
-            BaseAttackPower = attackPower;
-            BaseAttackRange = attackRange;
-            BaseAttackResetTime = attackResetTime;
         }
 
-        protected Warrior(Vector2 position, int commandNumber)
+        protected Warrior(Vector2 position, int teamNumber)
         {
             IsAlive = true;
 
             Position = position;
-            CommandNumber = commandNumber;
+            TeamNumber = teamNumber;
 
-            BaseCommandNumber = commandNumber;
+            BaseTeamNumber = teamNumber;
         }
 
         protected virtual int CalculateAttackPower(Warrior target)
@@ -115,7 +190,7 @@ namespace ArmyBattle.Abstraction
 
         protected virtual Warrior GetTarget()
         {
-            return AllUnits.FirstOrDefault(t => Vector2.Distance(Position, t.Position) <= AttackRange && t.CommandNumber != CommandNumber);
+            return AllUnits.FirstOrDefault(t => Vector2.Distance(Position, t.Position) <= AttackRange && t.TeamNumber != TeamNumber);
         }
 
         public virtual void Attack(Warrior target)
@@ -195,7 +270,7 @@ namespace ArmyBattle.Abstraction
             }
         }
 
-        public abstract Warrior GetInstance(Vector2 position, int commandNumber);
+        public abstract Warrior GetInstance(Vector2 position, int teamNumber);
 
     }
 }

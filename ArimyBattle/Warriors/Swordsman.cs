@@ -6,9 +6,9 @@
     using System.Numerics;
     public sealed class Swordsman : Warrior
     {
-        public override Warrior GetInstance(Vector2 position, int commandNumber)
+        public override Warrior GetInstance(Vector2 position, int teamNumberParam)
         {
-            return new Swordsman( position, commandNumber)
+            return new Swordsman( position, teamNumberParam)
             {
                 AllUnits = AllUnits,
                 AttackPower = AttackPower,
@@ -23,11 +23,11 @@
         }
 
 
-        public Swordsman(List<Warrior> allUnits, Vector2 position, int commandNumber, int hp, int def, int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors) : base(allUnits, position, commandNumber, hp, def, attackPower, attackRange, attackResetTime, skill, dominanceWarriors, suppressionWarriors)
+        public Swordsman(List<Warrior> allUnits, Vector2 position, int teamNumber, int hp, int def, int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors) : base(allUnits, position, teamNumber, hp, def, attackPower, attackRange, attackResetTime, skill, dominanceWarriors, suppressionWarriors)
         {
         }
 
-        public Swordsman(Vector2 position, int commandNumber) : base(position, commandNumber)
+        public Swordsman(Vector2 position, int teamNumber) : base(position, teamNumber)
         {
         }
     }

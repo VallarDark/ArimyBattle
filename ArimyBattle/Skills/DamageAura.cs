@@ -1,28 +1,26 @@
-﻿using System.Collections.Generic;
-
-namespace ArmyBattle.Skills
+﻿namespace ArmyBattle.Skills
 {
     using Abstraction;
+    using System.Collections.Generic;
 
     class DamageAura : StrangerSkill
     {
-        public DamageAura( List<Warrior> targets) : base( targets)
+        public DamageAura(Warrior caster, List<Warrior> targets, ISkill innerSkill = null) : base(caster, targets, innerSkill)
         {
-            Range = 2;
             Strange = 5;
+            RollbackTime = 3;
+            CastTime = 2;
+
             ActionType = ActionTypeEnum.Debuff;
             CountType = CountTypeEnum.Many;
-        }
 
-        public override void UseSkill(Warrior caster)
-        {
-            foreach (var target in GetTarget())
+            SkillFunk = (warrior) =>
             {
-                target.Hp -= 30;
-            }
-
-            base.UseSkill(caster);
+                foreach (var target in GetTarget())
+                {
+                    target.Hp -= Strange;
+                }
+            };
         }
-
     }
 }

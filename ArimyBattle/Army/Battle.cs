@@ -21,7 +21,7 @@
 
                     allUnits: _warriors,
                     position: new Vector2(0, 0),
-                    commandNumber: 0,
+                    teamNumber: 0,
                     hp: 200,
                     def: 5,
                     attackPower: 10,
@@ -46,7 +46,7 @@
             var sameType = _prototypes.FirstOrDefault(p => p.GetType() == newWarrior.GetType());
             if (sameType != null)
             {
-                var result = sameType.GetInstance(newWarrior.Position, newWarrior.CommandNumber);
+                var result = sameType.GetInstance(newWarrior.Position, newWarrior.TeamNumber);
                 _warriors.Add(result);
             }
         }
