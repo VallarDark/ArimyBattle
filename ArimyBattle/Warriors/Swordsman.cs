@@ -23,7 +23,10 @@
         }
 
 
-        public Swordsman(List<Warrior> allUnits, Vector2 position, int teamNumber, int hp, int def, int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors) : base(allUnits, position, teamNumber, hp, def, attackPower, attackRange, attackResetTime, skill, dominanceWarriors, suppressionWarriors)
+        public Swordsman(List<Warrior> allUnits, Vector2 position, int teamNumber, int hp, int def,
+            int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors,
+            List<Type> suppressionWarriors) : base(allUnits, position, teamNumber, hp, def, attackPower,
+            attackRange, attackResetTime, skill, dominanceWarriors, suppressionWarriors)
         {
         }
 
