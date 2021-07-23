@@ -6,15 +6,12 @@
     {
         public DefDamageAuraSelfHealing(List<Warrior> targets, ISkill innerSkill = null) : base(innerSkill)
         {
-            RollbackTime = 3;
-            CastTime = 2;
-
-            InnerSkill = new DefAura(targets, new DamageAura(targets));
+            InnerSkill = new DefAura(targets, new DamageAura(targets,new SelfHealing()));
         }
 
         protected override void SkillLogic(Warrior caster)
         {
-            caster.Hp += 2;
+
         }
     }
 }

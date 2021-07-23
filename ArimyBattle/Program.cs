@@ -1,9 +1,5 @@
 ﻿namespace ArmyBattle
 {
-    using System.Numerics;
-    using Army;
-    using Warriors;
-
     class Program
     {
         static void Main()

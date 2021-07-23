@@ -1,4 +1,6 @@
-﻿namespace ArmyBattle.Factories
+﻿
+
+namespace ArmyBattle.Factories
 {
     using System;
     using System.Collections.Generic;
@@ -6,32 +8,32 @@
     using Abstraction;
     using Skills;
     using Warriors;
-    public class SwordsmanFactory: WarriorFactory
+    public class ArcherFactory : WarriorFactory
     {
         protected override Warrior SetPrototype()
         {
-            return new Swordsman(
+            return new Archer(
                 allUnits: AllWarriors,
                 position: new Vector2(0, 0),
                 teamNumber: 0,
-                hp: 200,
-                def: 5,
-                attackPower: 10,
-                attackRange: 1,
-                attackResetTime: 3,
-                skill: new DefAura(AllWarriors),
+                hp: 100,
+                def: 2,
+                attackPower: 15,
+                attackRange: 5,
+                attackResetTime: 2,
+                skill: new SelfCleanup(),
                 dominanceWarriors: new List<Type>()
                 {
-                    typeof(Archer)
+                    typeof(LanceKnight)
                 },
                 suppressionWarriors: new List<Type>()
                 {
-                    typeof(LanceKnight)
+                    typeof(Swordsman)
                 }
                 );
         }
 
-        public SwordsmanFactory(List<Warrior> allWarriors) : base(allWarriors)
+        public ArcherFactory(List<Warrior> allWarriors) : base(allWarriors)
         {
         }
     }

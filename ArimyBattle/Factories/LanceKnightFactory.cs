@@ -6,32 +6,32 @@
     using Abstraction;
     using Skills;
     using Warriors;
-    public class SwordsmanFactory: WarriorFactory
+    public class LanceKnightFactory : WarriorFactory
     {
         protected override Warrior SetPrototype()
         {
-            return new Swordsman(
+            return new LanceKnight(
                 allUnits: AllWarriors,
                 position: new Vector2(0, 0),
                 teamNumber: 0,
-                hp: 200,
+                hp: 150,
                 def: 5,
-                attackPower: 10,
-                attackRange: 1,
-                attackResetTime: 3,
-                skill: new DefAura(AllWarriors),
+                attackPower: 15,
+                attackRange: 2,
+                attackResetTime: 2,
+                skill: new DamageAura(AllWarriors),
                 dominanceWarriors: new List<Type>()
                 {
-                    typeof(Archer)
+                    typeof(Swordsman)
                 },
                 suppressionWarriors: new List<Type>()
                 {
-                    typeof(LanceKnight)
+                    typeof(Archer)
                 }
                 );
         }
 
-        public SwordsmanFactory(List<Warrior> allWarriors) : base(allWarriors)
+        public LanceKnightFactory(List<Warrior> allWarriors) : base(allWarriors)
         {
         }
     }
