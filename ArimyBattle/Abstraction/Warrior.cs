@@ -7,6 +7,7 @@ namespace ArmyBattle.Abstraction
     using System;
     public abstract class Warrior : IWarrior
     {
+
         protected Random Random;
 
         protected bool HasAction;

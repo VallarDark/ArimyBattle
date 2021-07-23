@@ -1,35 +1,22 @@
 ﻿namespace ArmyBattle.Army
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Numerics;
     using System.Timers;
     using Abstraction;
-    using Skills;
-    using Warriors;
+    using Factories;
+
     public class Battle
     {
         private readonly List<Warrior> _warriors;
-        private readonly List<Warrior> _prototypes;
+        private readonly List<WarriorFactory> _factories;
         private readonly Timer _timer;
 
         public void UnitInitializer()
         {
-            _prototypes.Add(
-                new Swordsman(
-
-                    allUnits: _warriors,
-                    position: new Vector2(0, 0),
-                    teamNumber: 0,
-                    hp: 200,
-                    def: 5,
-                    attackPower: 10,
-                    attackRange: 1,
-                    attackResetTime: 3,
-                    skill: new DefAura(_warriors),
-                    dominanceWarriors: new List<Type>(),
-                    suppressionWarriors: new List<Type>()));
+            _factories.Add(new SwordsmanFactory(_warriors));
+                
         }
 
 
@@ -37,18 +24,13 @@
         {
             _timer = new Timer();
             _warriors = new List<Warrior>();
-            _prototypes = new List<Warrior>();
+            _factories = new List<WarriorFactory>();
             UnitInitializer();
         }
 
-        public void AddWarrior(Warrior newWarrior)
+        public Warrior AddWarrior<T>(Vector2 position ,int teamNumber) where T : WarriorFactory
         {
-            var sameType = _prototypes.FirstOrDefault(p => p.GetType() == newWarrior.GetType());
-            if (sameType != null)
-            {
-                var result = sameType.GetInstance(newWarrior.Position, newWarrior.TeamNumber);
-                _warriors.Add(result);
-            }
+            return _factories.FirstOrDefault(f => f.GetType() == typeof(T))?.CreateWarrior(position, teamNumber);
         }
 
         private void StartRound(object sender, ElapsedEventArgs e)

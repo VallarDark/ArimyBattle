@@ -1,11 +1,8 @@
 ﻿namespace ArmyBattle.Abstraction
 {
+    using System.Threading.Tasks;
     public abstract class SelfSkill : ISkill
     {
-        protected delegate void Skill(Warrior caster);
-        protected Skill SkillFunk;
-
-        protected Warrior Caster;
         protected int Strange;
         protected ISkill InnerSkill;
         protected int RollbackTime;
@@ -14,34 +11,38 @@
         protected int RollbackCounter;
         protected int CastCounter;
 
-        protected SelfSkill(Warrior caster, ISkill innerSkill = null)
+        protected SelfSkill(ISkill innerSkill = null)
         {
-            Caster = caster;
             InnerSkill = innerSkill;
         }
 
-        public void UseSkill(Warrior caster)
+        protected abstract void SkillLogic(Warrior caster);
+
+        public async void UseSkill(Warrior caster)
         {
-            if (RollbackCounter<=0)
+            await Task.Run((() =>
             {
-                if (CastCounter<=0)
+                if (RollbackCounter <= 0)
                 {
-                    SkillFunk(caster);
-                    CastCounter = CastTime;
+                    if (CastCounter <= 0)
+                    {
+                        SkillLogic(caster);
+                        CastCounter = CastTime;
+                    }
+                    else
+                    {
+                        CastCounter--;
+                    }
+
+                    RollbackCounter = RollbackTime;
                 }
                 else
                 {
-                    CastCounter--;
+                    RollbackCounter--;
                 }
-                
-                RollbackCounter = RollbackTime;
-            }
-            else
-            {
-                RollbackCounter--;
-            }
 
-            InnerSkill?.UseSkill(caster);
+                InnerSkill?.UseSkill(caster);
+            }));
         }
     }
 }

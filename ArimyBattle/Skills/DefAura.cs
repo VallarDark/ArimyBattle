@@ -3,9 +3,9 @@
     using Abstraction;
     using System.Collections.Generic;
 
-    class DefAura:StrangerSkill
+    public class DefAura:StrangerSkill
     {
-        public DefAura(Warrior caster, List<Warrior> targets, ISkill innerSkill = null) : base(caster, targets, innerSkill)
+        public DefAura(List<Warrior> targets, ISkill innerSkill = null) : base(targets, innerSkill)
         {
             Strange = 5;
             RollbackTime = 3;
@@ -13,14 +13,14 @@
 
             ActionType = ActionTypeEnum.Buff;
             CountType = CountTypeEnum.Many;
+        }
 
-            SkillFunk = (warrior) =>
+        protected override void SkillLogic(Warrior caster)
+        {
+            foreach (var target in GetTarget(caster))
             {
-                foreach (var target in GetTarget())
-                {
-                    target.Def += Strange;
-                }
-            };
+                target.Def += Strange;
+            }
         }
     }
 }

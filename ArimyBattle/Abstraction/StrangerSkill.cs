@@ -1,10 +1,8 @@
-﻿
-
-using System.Linq;
-using System.Numerics;
-
-namespace ArmyBattle.Abstraction
+﻿namespace ArmyBattle.Abstraction
 {
+    using System.Linq;
+    using System.Numerics;
+    using System.Threading.Tasks;
     using System.Collections.Generic;
     public abstract class StrangerSkill : ISkill
     {
@@ -19,11 +17,9 @@ namespace ArmyBattle.Abstraction
             Debuff
         }
 
-        protected delegate void Skill(Warrior caster);
-        protected Skill SkillFunk;
-
         protected ActionTypeEnum ActionType;
         protected CountTypeEnum CountType;
+
         protected int RollbackTime;
         protected int CastTime;
 
@@ -31,28 +27,28 @@ namespace ArmyBattle.Abstraction
         protected int Strange;
         protected ISkill InnerSkill;
         protected List<Warrior> Targets;
-        protected Warrior Caster;
+
 
         protected int RollbackCounter;
         protected int CastCounter;
 
-        protected StrangerSkill(Warrior caster, List<Warrior> targets, ISkill innerSkill = null)
+        protected StrangerSkill(List<Warrior> targets, ISkill innerSkill = null)
         {
-            Caster = caster;
             Targets = targets;
             InnerSkill = innerSkill;
+
         }
 
-        protected List<Warrior> GetTarget()
+        protected List<Warrior> GetTarget(Warrior caster)
         {
-            var currentTargets = Targets.Where(t => Vector2.Distance(Caster.Position, t.Position) <= Range).ToList();
+            var currentTargets = Targets.Where(t => Vector2.Distance(caster.Position, t.Position) <= Range && t!= caster).ToList();
             if (ActionType == ActionTypeEnum.Buff)
             {
-                currentTargets = currentTargets.Where(t => t.TeamNumber == Caster.TeamNumber).ToList();
+                currentTargets = currentTargets.Where(t => t.TeamNumber == caster.TeamNumber).ToList();
             }
             else
             {
-                currentTargets = currentTargets.Where(t => t.TeamNumber != Caster.TeamNumber).ToList();
+                currentTargets = currentTargets.Where(t => t.TeamNumber != caster.TeamNumber).ToList();
             }
 
             if (CountType == CountTypeEnum.Single)
@@ -65,28 +61,32 @@ namespace ArmyBattle.Abstraction
             }
         }
 
-        public void UseSkill(Warrior caster)
+        protected abstract void SkillLogic(Warrior caster);
+        public async void UseSkill(Warrior caster)
         {
-            if (RollbackCounter <= 0)
+            await Task.Run((() =>
             {
-                if (CastCounter <= 0)
+                if (RollbackCounter <= 0)
                 {
-                    SkillFunk(caster);
-                    CastCounter = CastTime;
+                    if (CastCounter <= 0)
+                    {
+                        SkillLogic(caster);
+                        CastCounter = CastTime;
+                    }
+                    else
+                    {
+                        CastCounter--;
+                    }
+
+                    RollbackCounter = RollbackTime;
                 }
                 else
                 {
-                    CastCounter--;
+                    RollbackCounter--;
                 }
 
-                RollbackCounter = RollbackTime;
-            }
-            else
-            {
-                RollbackCounter--;
-            }
-
-            InnerSkill?.UseSkill(caster);
+                InnerSkill?.UseSkill(caster);
+            }));
         }
     }
 }
