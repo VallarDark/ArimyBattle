@@ -16,9 +16,9 @@
         public void UnitInitializer()
         {
             _factories.Add(new SwordsmanFactory(_warriors));
-                
+            _factories.Add(new ArcherFactory(_warriors));
+            _factories.Add(new LanceKnightFactory(_warriors));
         }
-
 
         public Battle()
         {

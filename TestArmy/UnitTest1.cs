@@ -1,3 +1,5 @@
+using ArmyBattle.Abstraction;
+
 namespace TestArmy
 {
     using System;
@@ -38,10 +40,14 @@ namespace TestArmy
             );
 
             // Act
-            var testWarrior = battle.AddWarrior<SwordsmanFactory>(position, teamNumber);
+            var testWarrior = battle.AddWarrior<SwordsmanFactory>(position, teamNumber); 
+            var testWarrior2 = battle.AddWarrior<ArcherFactory>(position, teamNumber);
 
             // Assert
             Assert.Equal(resultWarrior.GetType(), testWarrior.GetType());
+            //Assert.NotEqual(resultWarrior.GetType(), testWarrior2.GetType());
+            Assert.IsNotType<Archer>(testWarrior);
+            //Assert.IsType<Swordsman>(testWarrior2);
             Assert.Equal(resultWarrior.TeamNumber, testWarrior.TeamNumber);
             Assert.Equal(resultWarrior.Position, testWarrior.Position);
         }
