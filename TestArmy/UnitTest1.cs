@@ -1,5 +1,3 @@
-using ArmyBattle.Abstraction;
-
 namespace TestArmy
 {
     using System;
@@ -29,14 +27,8 @@ namespace TestArmy
                 attackRange: 1,
                 attackResetTime: 3,
                 skill: new DefAura(null),
-                dominanceWarriors: new List<Type>()
-                {
-
-                },
+                dominanceWarriors: new List<Type>(),
                 suppressionWarriors: new List<Type>()
-                {
-
-                }
             );
 
             // Act
@@ -44,10 +36,12 @@ namespace TestArmy
             var testWarrior2 = battle.AddWarrior<ArcherFactory>(position, teamNumber);
 
             // Assert
+            Assert.NotNull(testWarrior);
+            Assert.NotNull(testWarrior2);
             Assert.Equal(resultWarrior.GetType(), testWarrior.GetType());
-            //Assert.NotEqual(resultWarrior.GetType(), testWarrior2.GetType());
+            Assert.NotEqual(resultWarrior.GetType(), testWarrior2.GetType());
             Assert.IsNotType<Archer>(testWarrior);
-            //Assert.IsType<Swordsman>(testWarrior2);
+            Assert.IsType<Archer>(testWarrior2);
             Assert.Equal(resultWarrior.TeamNumber, testWarrior.TeamNumber);
             Assert.Equal(resultWarrior.Position, testWarrior.Position);
         }
