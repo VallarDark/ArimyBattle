@@ -12,6 +12,8 @@ namespace TestArmy
     {
         [Theory]
         [InlineData(2, 2, 2)]
+        [InlineData(0, 7, 0)]
+        [InlineData(-6, 2, 7)]
         public void BattleAddWarriorTest(int x, int y, int teamNumber)
         {
             // Arrange
