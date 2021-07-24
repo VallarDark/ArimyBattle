@@ -4,6 +4,7 @@
     public abstract class SelfSkill : ISkill
     {
         protected int Strange;
+        protected Renderer Renderer;
         protected ISkill InnerSkill;
         protected int RollbackTime;
         protected int CastTime;
@@ -27,6 +28,7 @@
                     if (CastCounter <= 0)
                     {
                         SkillLogic(caster);
+                        Renderer.Render();
                         CastCounter = CastTime;
                     }
                     else
