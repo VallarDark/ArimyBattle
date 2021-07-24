@@ -3,6 +3,6 @@
     using System.Numerics;
     public interface IInstanceable
     {
-        public Warrior GetInstance(Vector2 position, int teamNumber);
+        public Warrior GetInstance(Warrior prototype,Vector2 position, int teamNumber);
     }
 }

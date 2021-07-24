@@ -17,7 +17,7 @@
         {
             Prototype ??= SetPrototype();
 
-            return Prototype.GetInstance(position, teamNumber);
+            return Prototype.GetInstance(Prototype,position, teamNumber);
         }
 
     }

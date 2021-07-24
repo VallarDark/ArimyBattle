@@ -1,20 +1,22 @@
-﻿using System.Linq;
-
-namespace ArmyBattle.Abstraction
+﻿namespace ArmyBattle.Abstraction
 {
     using System.Collections.Generic;
     using System.Numerics;
     using System;
+    using System.Linq;
     public abstract class Warrior : IWarrior
     {
-
+        protected Renderer Renderer;
         protected Random Random;
 
         protected bool HasAction;
-        protected bool IsAlive;
-        protected int AttackCounter;    // timer to reset action       
-        protected int DieCounter;       // rounds count before clear dead warrior
+        protected bool IsAlive => Hp > 0;
+        protected int AttackCounter;        // timer to reset action       
+        protected int DieCounter;           // rounds count before clear dead warrior
 
+        protected int TravelDistance;
+
+        protected int BaseDieCounter;       
         protected readonly int BaseHp;
         protected readonly int BaseDef;
         protected readonly int BaseAttackPower;
@@ -34,7 +36,7 @@ namespace ArmyBattle.Abstraction
             get => InnerTeamNumber;
             set
             {
-                if (value>=0)
+                if (value >= 0)
                 {
                     InnerTeamNumber = value;
                 }
@@ -45,13 +47,14 @@ namespace ArmyBattle.Abstraction
             get => InnerHp;
             set
             {
-                if (value >= 0 && value<=BaseHp)
+                if (value >= 0 && value <= BaseHp)
                 {
                     InnerHp = value;
                 }
             }
         }
-        public int Def {
+        public int Def
+        {
             get => InnerDef;
             set
             {
@@ -61,7 +64,8 @@ namespace ArmyBattle.Abstraction
                 }
             }
         }
-        public int AttackPower {
+        public int AttackPower
+        {
             get => InnerAttackPower;
             set
             {
@@ -71,7 +75,8 @@ namespace ArmyBattle.Abstraction
                 }
             }
         }
-        public int AttackRange {
+        public int AttackRange
+        {
             get => InnerAttackRange;
             set
             {
@@ -81,7 +86,8 @@ namespace ArmyBattle.Abstraction
                 }
             }
         }
-        public int AttackResetTime {
+        public int AttackResetTime
+        {
             get => InnerAttackResetTime;
             set
             {
@@ -138,7 +144,9 @@ namespace ArmyBattle.Abstraction
             ResetCommandNumber();
         }
 
-        protected Warrior(List<Warrior> allUnits, Vector2 position, int teamNumber, int hp, int def, int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors)
+        protected Warrior(List<Warrior> allUnits, Vector2 position, int teamNumber,
+            int hp, int def, int attackPower, int attackRange, int attackResetTime,
+            ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors)
         {
             BaseTeamNumber = teamNumber;
             BaseHp = hp;
@@ -147,8 +155,10 @@ namespace ArmyBattle.Abstraction
             BaseAttackRange = attackRange;
             BaseAttackResetTime = attackResetTime;
 
-            IsAlive = true;
-            DieCounter = 10;
+            BaseDieCounter = 5;
+            DieCounter = BaseDieCounter;
+
+            TravelDistance = 2;
 
             AllUnits = allUnits;
             Position = position;
@@ -162,16 +172,6 @@ namespace ArmyBattle.Abstraction
             DominanceWarriors = dominanceWarriors;
             SuppressionWarriors = suppressionWarriors;
 
-        }
-
-        protected Warrior(Vector2 position, int teamNumber)
-        {
-            IsAlive = true;
-
-            Position = position;
-            TeamNumber = teamNumber;
-
-            BaseTeamNumber = teamNumber;
         }
 
         protected virtual int CalculateAttackPower(Warrior target)
@@ -194,18 +194,21 @@ namespace ArmyBattle.Abstraction
             return AllUnits.FirstOrDefault(t => Vector2.Distance(Position, t.Position) <= AttackRange && t.TeamNumber != TeamNumber);
         }
 
+        protected virtual Warrior GetPotentialTarget()
+        {
+            return AllUnits.OrderBy(t => Vector2.Distance(Position, t.Position)).FirstOrDefault(t =>  t.TeamNumber != TeamNumber);
+        }
+
         public virtual void Attack(Warrior target)
         {
             var damage = CalculateAttackPower(target) - target.Def;
             target.Hp -= damage;
         }
 
-
-        public void UseSkill(params Warrior[] targets)
+        public void UseSkill()
         {
             Skill.UseSkill(this);
         }
-
 
         public virtual void Run(Vector2 direction)
         {
@@ -214,30 +217,24 @@ namespace ArmyBattle.Abstraction
 
         public void Action()
         {
+            Renderer.Render();
             if (IsAlive)
             {
                 if (!HasAction)
                 {
-                    HpCheck();
                     var target = GetTarget();
                     if (target != null)
                     {
                         Attack(target);
+                        UseSkill();
                         HasAction = true;
                     }
                     else
                     {
-                        var newPosition = new Vector2(Random.Next(-1, 1), Random.Next(-1, 1));
-                        var neighbor = AllUnits.FirstOrDefault(u =>
-                            Vector2.Distance(Position + newPosition, u.Position) <= 0.5 && u != this);
-                        if (neighbor != null)
-                        {
-                            Rearrangement(neighbor);
-                        }
-                        else
-                        {
-                            Position += newPosition;
-                        }
+                        var targetPosition = GetPotentialTarget().Position;
+                        var delta = targetPosition - this.Position;
+                        var step = new Vector2(delta.X % TravelDistance, delta.Y % TravelDistance);
+                        Position += step;
 
                         HasAction = false;
                     }
@@ -253,6 +250,10 @@ namespace ArmyBattle.Abstraction
                     AttackCounter--;
                 }
             }
+            else
+            {
+                Die();
+            }
         }
 
         public virtual void Rearrangement(Warrior target)
@@ -262,16 +263,16 @@ namespace ArmyBattle.Abstraction
             target.Position = temp;
         }
 
+        public abstract Warrior GetInstance(Warrior prototype, Vector2 position, int teamNumber);
 
-        public virtual void HpCheck()
+        public void Die()
         {
-            if (Hp <= 0)
+            if (DieCounter <= 0)
             {
-                IsAlive = false;
+                AllUnits.Remove(this);
+                DieCounter = BaseDieCounter;
             }
+            DieCounter--;
         }
-
-        public abstract Warrior GetInstance(Vector2 position, int teamNumber);
-
     }
 }

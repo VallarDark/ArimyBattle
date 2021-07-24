@@ -6,6 +6,7 @@
     using System.Collections.Generic;
     public abstract class StrangerSkill : ISkill
     {
+        protected Renderer Renderer;
         protected enum CountTypeEnum
         {
             Single,
@@ -36,7 +37,6 @@
         {
             Targets = targets;
             InnerSkill = innerSkill;
-
         }
 
         protected List<Warrior> GetTarget(Warrior caster)
@@ -71,6 +71,7 @@
                     if (CastCounter <= 0)
                     {
                         SkillLogic(caster);
+                        Renderer.Render();
                         CastCounter = CastTime;
                     }
                     else

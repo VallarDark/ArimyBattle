@@ -2,6 +2,6 @@
 {
     public interface IDieable
     {
-        public void HpCheck();
+        public void Die();
     }
 }

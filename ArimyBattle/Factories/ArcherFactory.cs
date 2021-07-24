@@ -1,6 +1,4 @@
-﻿
-
-namespace ArmyBattle.Factories
+﻿namespace ArmyBattle.Factories
 {
     using System;
     using System.Collections.Generic;

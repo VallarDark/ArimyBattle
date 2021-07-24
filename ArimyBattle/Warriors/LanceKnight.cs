@@ -6,22 +6,22 @@
     using System.Numerics;
     public sealed class LanceKnight : Warrior
     {
-        public override Warrior GetInstance(Vector2 position, int teamNumberParam)
+        public override Warrior GetInstance(Warrior prototype, Vector2 position, int teamNumber)
         {
-            return new LanceKnight( position, teamNumberParam)
-            {
-                AllUnits = AllUnits,
-                AttackPower = AttackPower,
-                AttackResetTime = AttackResetTime,
-                AttackRange = AttackRange,
-                Hp = Hp,
-                Def = Def,
-                Skill = Skill,
-                DominanceWarriors = DominanceWarriors,
-                SuppressionWarriors = SuppressionWarriors
-            };
+            return new LanceKnight(
+                prototype.AllUnits,
+                position,
+                teamNumber,
+                prototype.Hp,
+                prototype.Def,
+                prototype.AttackPower,
+                prototype.AttackRange,
+                prototype.AttackResetTime,
+                prototype.Skill,
+                prototype.DominanceWarriors,
+                prototype.SuppressionWarriors
+            );
         }
-
 
         public LanceKnight(List<Warrior> allUnits, Vector2 position, int teamNumber, int hp, int def,
             int attackPower, int attackRange, int attackResetTime, ISkill skill, List<Type> dominanceWarriors,
@@ -30,8 +30,5 @@
         {
         }
 
-        public LanceKnight(Vector2 position, int teamNumber) : base(position, teamNumber)
-        {
-        }
     }
 }
