@@ -19,7 +19,7 @@
                 attackPower: 15,
                 attackRange: 5,
                 attackResetTime: 2,
-                skill: new SelfCleanup(),
+                skill: new SelfHealing(),
                 dominanceWarriors: new List<Type>()
                 {
                     typeof(LanceKnight)

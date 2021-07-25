@@ -6,17 +6,16 @@
     using System.Linq;
     public abstract class Warrior : IWarrior
     {
-        protected Renderer Renderer;
+        private static int _counter=1;
+
         protected Random Random;
 
         protected bool HasAction;
         protected bool IsAlive => Hp > 0;
         protected int AttackCounter;        // timer to reset action       
-        protected int DieCounter;           // rounds count before clear dead warrior
 
         protected int TravelDistance;
 
-        protected int BaseDieCounter;       
         protected readonly int BaseHp;
         protected readonly int BaseDef;
         protected readonly int BaseAttackPower;
@@ -31,6 +30,7 @@
         protected int InnerAttackResetTime;
         protected int InnerTeamNumber;
 
+        public int Id { get; private set; }
         public int TeamNumber
         {
             get => InnerTeamNumber;
@@ -47,8 +47,12 @@
             get => InnerHp;
             set
             {
-                if (value >= 0 && value <= BaseHp)
+                if (value <= BaseHp)
                 {
+                    if (value<0)
+                    {
+                        value = 0;
+                    }
                     InnerHp = value;
                 }
             }
@@ -99,7 +103,7 @@
         }
 
         public Vector2 Position { get; set; }
-
+        public string Type => GetType().Name;
         public List<Warrior> AllUnits { get; protected set; }
         public ISkill Skill { get; protected set; }
         public List<Type> DominanceWarriors { get; protected set; }
@@ -148,15 +152,13 @@
             int hp, int def, int attackPower, int attackRange, int attackResetTime,
             ISkill skill, List<Type> dominanceWarriors, List<Type> suppressionWarriors)
         {
+            Id = _counter;
             BaseTeamNumber = teamNumber;
             BaseHp = hp;
             BaseDef = def;
             BaseAttackPower = attackPower;
             BaseAttackRange = attackRange;
             BaseAttackResetTime = attackResetTime;
-
-            BaseDieCounter = 5;
-            DieCounter = BaseDieCounter;
 
             TravelDistance = 2;
 
@@ -171,7 +173,7 @@
             Skill = skill;
             DominanceWarriors = dominanceWarriors;
             SuppressionWarriors = suppressionWarriors;
-
+            _counter++;
         }
 
         protected virtual int CalculateAttackPower(Warrior target)
@@ -199,10 +201,30 @@
             return AllUnits.OrderBy(t => Vector2.Distance(Position, t.Position)).FirstOrDefault(t =>  t.TeamNumber != TeamNumber);
         }
 
+        protected void ShortLog(Warrior warrior)
+        {
+            Console.WriteLine(
+                $" id {warrior.Id} \n" +
+                $" type {warrior.Type} \n" +
+                $" position {warrior.Position} \n"
+            );
+        }
+        protected void Log(Warrior caster)
+        {
+            Console.WriteLine($"origin:\n{caster}");
+
+        }
+
         public virtual void Attack(Warrior target)
         {
             var damage = CalculateAttackPower(target) - target.Def;
+
             target.Hp -= damage;
+
+
+            ShortLog(this);
+            Console.WriteLine($"_____Attack_____");
+            Log( target);
         }
 
         public void UseSkill()
@@ -212,48 +234,71 @@
 
         public virtual void Run(Vector2 direction)
         {
+            ShortLog(this);
+            Console.WriteLine($"from____Run____to");
+
             Position += direction;
+
+            ShortLog(this);
         }
 
         public void Action()
         {
-            Renderer.Render();
             if (IsAlive)
-            {
-                if (!HasAction)
                 {
-                    var target = GetTarget();
-                    if (target != null)
+                    if (!HasAction)
                     {
-                        Attack(target);
-                        UseSkill();
-                        HasAction = true;
+                        var target = GetTarget();
+                        if (target != null)
+                        {
+                            Attack(target);
+                            UseSkill();
+                            HasAction = true;
+                        }
+                        else
+                        {
+                            var potentialTarget = GetPotentialTarget();
+                            var targetPosition = potentialTarget.Position;
+
+                            var delta = targetPosition - Position;
+                            if (delta.X < -TravelDistance)
+                            {
+                                delta.X = -TravelDistance;
+                            }
+                            else if (delta.X > TravelDistance)
+                            {
+                                delta.X = TravelDistance;
+                            }
+
+                            if (delta.Y < -TravelDistance)
+                            {
+                                delta.Y = -TravelDistance;
+                            }
+                            else if (delta.Y > TravelDistance)
+                            {
+                                delta.Y = TravelDistance;
+                            }
+
+                            Run(delta);
+
+                            HasAction = false;
+                        }
                     }
                     else
                     {
-                        var targetPosition = GetPotentialTarget().Position;
-                        var delta = targetPosition - this.Position;
-                        var step = new Vector2(delta.X % TravelDistance, delta.Y % TravelDistance);
-                        Position += step;
+                        if (AttackCounter <= 0)
+                        {
+                            AttackCounter = AttackResetTime;
+                            HasAction = false;
+                        }
 
-                        HasAction = false;
+                        AttackCounter--;
                     }
                 }
                 else
                 {
-                    if (AttackCounter <= 0)
-                    {
-                        AttackCounter = AttackResetTime;
-                        HasAction = false;
-                    }
-
-                    AttackCounter--;
+                    Die();
                 }
-            }
-            else
-            {
-                Die();
-            }
         }
 
         public virtual void Rearrangement(Warrior target)
@@ -267,12 +312,24 @@
 
         public void Die()
         {
-            if (DieCounter <= 0)
-            {
-                AllUnits.Remove(this);
-                DieCounter = BaseDieCounter;
-            }
-            DieCounter--;
+            AllUnits.Remove(this);
+            Console.WriteLine("____Dead____");
+            ShortLog(this);
         }
+
+        public override string ToString()
+        {
+            return $"\tid: {Id} \n" +
+                   $"\ttype: {Type} \n" +
+                   $"\thp: {Hp} \n" +
+                   $"\tdef: {Def}\n" +
+                   $"\tposition: {Position.X},{Position.Y} \n" +
+                   $"\tteam number: {TeamNumber} \n" +
+                   $"\tattack power: {AttackPower} \n" +
+                   $"\tattack range: {AttackRange} \n" +
+                   $"\tattack reset time: {AttackResetTime} \n";
+        }
+
+
     }
 }

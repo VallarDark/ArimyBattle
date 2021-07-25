@@ -1,3 +1,6 @@
+using System.Linq;
+using ArmyBattle.Abstraction;
+
 namespace TestArmy
 {
     using System;
@@ -47,5 +50,6 @@ namespace TestArmy
             Assert.Equal(resultWarrior.TeamNumber, testWarrior.TeamNumber);
             Assert.Equal(resultWarrior.Position, testWarrior.Position);
         }
+
     }
 }

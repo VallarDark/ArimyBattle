@@ -1,12 +1,12 @@
 ﻿namespace ArmyBattle.Abstraction
 {
+    using System;
     using System.Linq;
     using System.Numerics;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
     public abstract class StrangerSkill : ISkill
     {
-        protected Renderer Renderer;
+
         protected enum CountTypeEnum
         {
             Single,
@@ -39,9 +39,20 @@
             InnerSkill = innerSkill;
         }
 
+        protected virtual void Log(Warrior caster, Warrior target = null)
+        {
+            Console.WriteLine($"_____DefAura_____");
+            Console.WriteLine($"Caster:\n{caster}");
+            if (target == null)
+            {
+                return;
+            }
+            Console.WriteLine($"Target:\n{target}");
+        }
+
         protected List<Warrior> GetTarget(Warrior caster)
         {
-            var currentTargets = Targets.Where(t => Vector2.Distance(caster.Position, t.Position) <= Range && t!= caster).ToList();
+            var currentTargets = Targets.Where(t => Vector2.Distance(caster.Position, t.Position) <= Range && t != caster).ToList();
             if (ActionType == ActionTypeEnum.Buff)
             {
                 currentTargets = currentTargets.Where(t => t.TeamNumber == caster.TeamNumber).ToList();
@@ -62,32 +73,30 @@
         }
 
         protected abstract void SkillLogic(Warrior caster);
-        public async void UseSkill(Warrior caster)
+        public void UseSkill(Warrior caster)
         {
-            await Task.Run((() =>
-            {
-                if (RollbackCounter <= 0)
-                {
-                    if (CastCounter <= 0)
-                    {
-                        SkillLogic(caster);
-                        Renderer.Render();
-                        CastCounter = CastTime;
-                    }
-                    else
-                    {
-                        CastCounter--;
-                    }
 
-                    RollbackCounter = RollbackTime;
+            if (RollbackCounter <= 0)
+            {
+                if (CastCounter <= 0)
+                {
+                    SkillLogic(caster);
+                    CastCounter = CastTime;
                 }
                 else
                 {
-                    RollbackCounter--;
+                    CastCounter--;
                 }
 
-                InnerSkill?.UseSkill(caster);
-            }));
+                RollbackCounter = RollbackTime;
+            }
+            else
+            {
+                RollbackCounter--;
+            }
+
+            InnerSkill?.UseSkill(caster);
+
         }
     }
 }

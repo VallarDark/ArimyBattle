@@ -1,4 +1,5 @@
-﻿namespace ArmyBattle.Abstraction
+﻿
+namespace ArmyBattle.Abstraction
 {
     public interface IWarrior:IDamageable,ISkillable,IMoveable,IDieable,IInstanceable
     {

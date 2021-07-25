@@ -15,9 +15,9 @@
                 position: new Vector2(0, 0),
                 teamNumber: 0,
                 hp: 150,
-                def: 5,
+                def: 4,
                 attackPower: 15,
-                attackRange: 2,
+                attackRange: 3,
                 attackResetTime: 2,
                 skill: new DamageAura(AllWarriors),
                 dominanceWarriors: new List<Type>()

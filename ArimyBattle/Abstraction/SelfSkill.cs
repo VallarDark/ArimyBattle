@@ -1,10 +1,9 @@
 ﻿namespace ArmyBattle.Abstraction
 {
-    using System.Threading.Tasks;
+    using System;
     public abstract class SelfSkill : ISkill
     {
         protected int Strange;
-        protected Renderer Renderer;
         protected ISkill InnerSkill;
         protected int RollbackTime;
         protected int CastTime;
@@ -17,34 +16,43 @@
             InnerSkill = innerSkill;
         }
 
+        protected virtual void Log(Warrior caster, Warrior target = null)
+        {
+            Console.WriteLine($"_____DefAura_____");
+            Console.WriteLine($"Caster:\n{caster}");
+            if (target == null)
+            {
+                return;
+            }
+            Console.WriteLine($"Target:\n{target}");
+        }
+
         protected abstract void SkillLogic(Warrior caster);
 
-        public async void UseSkill(Warrior caster)
+        public void UseSkill(Warrior caster)
         {
-            await Task.Run((() =>
-            {
-                if (RollbackCounter <= 0)
-                {
-                    if (CastCounter <= 0)
-                    {
-                        SkillLogic(caster);
-                        Renderer.Render();
-                        CastCounter = CastTime;
-                    }
-                    else
-                    {
-                        CastCounter--;
-                    }
 
-                    RollbackCounter = RollbackTime;
+            if (RollbackCounter <= 0)
+            {
+                if (CastCounter <= 0)
+                {
+                    SkillLogic(caster);
+                    CastCounter = CastTime;
                 }
                 else
                 {
-                    RollbackCounter--;
+                    CastCounter--;
                 }
 
-                InnerSkill?.UseSkill(caster);
-            }));
+                RollbackCounter = RollbackTime;
+            }
+            else
+            {
+                RollbackCounter--;
+            }
+
+            InnerSkill?.UseSkill(caster);
+
         }
     }
 }
