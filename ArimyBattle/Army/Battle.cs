@@ -1,9 +1,4 @@
-﻿
-
-
-using System.Text;
-
-namespace ArmyBattle.Army
+﻿namespace ArmyBattle.Army
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -13,6 +8,7 @@ namespace ArmyBattle.Army
     using System.Timers;
     using Abstraction;
     using Factories;
+    using System.Text;
 
     public class Battle
     {
@@ -24,7 +20,7 @@ namespace ArmyBattle.Army
         private readonly List<Warrior> _warriors;
         private readonly List<WarriorFactory> _factories;
 
-        private string _logger = "";
+        private string _logger;
         private int _counter = 10;
 
         public bool IsStarted => _isStarted;
@@ -61,22 +57,17 @@ namespace ArmyBattle.Army
 
             if (HasOtherTeams())
             {
-                Warrior first = null;
-                foreach (var warrior in _warriors)
-                {
-                    first = warrior;
-                    break;
-                }
-
-                if (first != null)
-                {
-                    Console.WriteLine($"!!!!!! Win {first.TeamNumber} team !!!!!!!!!");
-                }
-
+                
+                var first=_warriors.FirstOrDefault();
+                var msg = $"!!!!!! Win {first?.TeamNumber} team !!!!!!!!!";
+                _stringBuilder = new StringBuilder(_logger, _logger.Length + msg.Length);
+                _stringBuilder.Insert(_stringBuilder.Length, msg);
+                _logger = _stringBuilder.ToString();
+                Console.WriteLine(msg);
                 Stop();
             }
 
-
+            _logger = "";
             for (var index = 0; index < _warriors.Count; index++)
             {
                 var warrior = _warriors[index];
@@ -97,20 +88,7 @@ namespace ArmyBattle.Army
                     _counter--;
                 });
                 }
-
             }
-
-            //Parallel.For(0, _warriors.Count, index =>
-            // {
-            //     if (index < _warriors.Count)
-            //     {
-            //         _warriors[index].Action();
-            //         lock (_locker)
-            //         {
-            //             _logger += _warriors[index].GetLog();
-            //         }
-            //     }
-            // });
         }
 
         private bool HasOtherTeams()

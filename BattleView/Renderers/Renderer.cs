@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace BattleView.Renderers
 {
@@ -9,17 +8,20 @@ namespace BattleView.Renderers
     using System.Windows.Media;
     using System.Windows.Shapes;
     using ArmyBattle.Abstraction;
+    using System.Threading;
+    using System.Threading.Tasks;
     public class Renderer
     {
-        private readonly Dictionary<Warrior, Ellipse> _renderedWarriors;
+        private readonly Dictionary<Warrior, List<FrameworkElement>> _renderedWarriors;
         private readonly List<Warrior> _warriors;
         private readonly Canvas _canvas;
+
         private readonly int _radius;
         private readonly Dictionary<int, SolidColorBrush> _teamColors;
         private readonly Dictionary<string, SolidColorBrush> _typeColors;
         public Renderer(List<Warrior> warriors, Canvas canvas, int radius = 15)
         {
-            _renderedWarriors = new Dictionary<Warrior, Ellipse>();
+            _renderedWarriors = new Dictionary<Warrior, List<FrameworkElement>>();
             _warriors = warriors;
             _canvas = canvas;
             _radius = radius;
@@ -47,11 +49,105 @@ namespace BattleView.Renderers
             for (var index = 0; index < _warriors.Count; index++)
             {
                 var warrior = _warriors[index];
-                if (warrior!=null)
+                if (warrior != null)
                 {
-                     Draw(warrior);
+                    Draw(warrior);
                 }
             }
+        }
+
+        public void Clear()
+        {
+            _canvas.Children.Clear();
+            _renderedWarriors.Clear();
+        }
+
+        public void Remove(int id)
+        {
+            var warrior=_warriors.FirstOrDefault(w => w.Id == id);
+            if (warrior!= null)
+            {
+                var children = _renderedWarriors[warrior];
+                foreach (var child in children)
+                {
+                    _canvas.Children.Remove(child);
+                }
+
+                _renderedWarriors.Remove(warrior);
+            }
+        }
+
+
+        private void EditView(Warrior warrior)
+        {
+            var warriorView = _renderedWarriors[warrior][0];
+            var warriorId = _renderedWarriors[warrior][1] as TextBlock;
+            var warriorHp = _renderedWarriors[warrior][2] as TextBlock;
+
+            warriorView?.SetValue(Canvas.LeftProperty, (double)warrior.Position.X);
+            warriorView?.SetValue(Canvas.TopProperty, (double)warrior.Position.Y);
+
+            warriorId?.SetValue(Canvas.LeftProperty, (double)warrior.Position.X - 25);
+            warriorId?.SetValue(Canvas.TopProperty, (double)warrior.Position.Y - 15);
+
+            if (warriorId != null)
+            {
+                warriorId.Text = $"id: {warrior.Id}";
+            }
+
+            warriorHp?.SetValue(Canvas.LeftProperty, (double)warrior.Position.X + 15);
+            warriorHp?.SetValue(Canvas.TopProperty, (double)warrior.Position.Y - 15);
+
+            if (warriorHp != null)
+            {
+                warriorHp.Text = $"hp: {warrior.Hp}";
+            }
+        }
+
+        private void AddView(Warrior warrior)
+        {
+            Ellipse circle = new Ellipse()
+            {
+                Width = _radius,
+                Height = _radius,
+                StrokeThickness = 3,
+                Fill = _typeColors[warrior.Type],
+                Stroke = _teamColors[warrior.TeamNumber]
+            };
+            circle.SetValue(Canvas.LeftProperty, (double)warrior.Position.X);
+            circle.SetValue(Canvas.TopProperty, (double)warrior.Position.Y);
+
+
+            TextBlock idBlock = new TextBlock {Text = $"id: {warrior.Id}"};
+            idBlock.SetValue(Canvas.LeftProperty, (double)warrior.Position.X - 25);
+            idBlock.SetValue(Canvas.TopProperty, (double)warrior.Position.Y - 15);
+
+
+            TextBlock hpBlock = new TextBlock {Text = $"hp: {warrior.Hp}"};
+            hpBlock.SetValue(Canvas.LeftProperty, (double)warrior.Position.X + 15);
+            hpBlock.SetValue(Canvas.TopProperty, (double)warrior.Position.Y - 15);
+
+            _renderedWarriors.Add(warrior, new List<FrameworkElement>() { circle, idBlock, hpBlock });
+
+            _canvas.Children.Add(circle);
+            _canvas.Children.Add(idBlock);
+            _canvas.Children.Add(hpBlock);
+
+            warrior.Dead += (() =>
+            {
+                Task.Run(() =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        circle.Fill = Brushes.GhostWhite;
+                        circle.Stroke = Brushes.LightGray;
+                        Thread.Sleep(1800);
+                        _canvas.Children.Remove(circle);
+                        _canvas.Children.Remove(idBlock);
+                        _canvas.Children.Remove(hpBlock);
+                    });
+                });
+            });
         }
 
         private void Draw(Warrior warrior)
@@ -60,42 +156,14 @@ namespace BattleView.Renderers
             {
                 Application.Current?.Dispatcher?.Invoke(() =>
                 {
-                    _renderedWarriors[warrior].SetValue(Canvas.LeftProperty, (double)warrior.Position.X);
-                    _renderedWarriors[warrior].SetValue(Canvas.TopProperty, (double)warrior.Position.Y);
+                    EditView(warrior);
                 });
             }
             else
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    Ellipse circle = new Ellipse()
-                    {
-                        Width = _radius,
-                        Height = _radius,
-                        StrokeThickness = 3
-                    };
-                    circle.Fill = _typeColors[warrior.Type];
-                    circle.Stroke = _teamColors[warrior.TeamNumber];
-
-                    circle.SetValue(Canvas.LeftProperty, (double)warrior.Position.X);
-                    circle.SetValue(Canvas.TopProperty, (double)warrior.Position.Y);
-
-                    _renderedWarriors.Add(warrior, circle);
-                    _canvas.Children.Add(circle);
-
-                    warrior.Dead += (() =>
-                    {
-                        Task.Run(() =>
-                        {
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                circle.Fill = Brushes.GhostWhite;
-                                circle.Stroke = Brushes.LightGray;
-                                Thread.Sleep(800);
-                                _canvas.Children.Remove(circle);
-                            });
-                        });
-                    });
+                    AddView(warrior);
                 });
             }
         }

@@ -14,9 +14,12 @@
     /// </summary>
     public partial class MainWindow
     {
+        private const string TeamErrorC = "You cant start battle less then 2 other teams";
+
         private readonly Battle _battle;
         private readonly Renderer _renderer;
         private readonly Timer _renderTime;
+
         private int _counter = 10;
         public MainWindow()
         {
@@ -64,8 +67,6 @@
                     _battle.AddWarrior<ArcherFactory>(new Vector2(positionX, positionY), teamNumber);
                 }
 
-
-                /*Dispatcher.Invoke(() => { _renderer.Render(); });*/ 
                 Task.Run(() => { _renderer.Render(); });
             }
         }
@@ -80,7 +81,6 @@
                     Dispatcher.Invoke(() => { LogArea.Text = _battle.GetLog(); });
                     _counter = 15;
                 }
-
                 _counter--;
             });
         }
@@ -88,7 +88,14 @@
         private void StartButton_OnClick(object sender, RoutedEventArgs e)
         {
             _battle.Start();
-            _renderTime.Start();
+            if (_battle.IsStarted)
+            {
+                _renderTime.Start();
+            }
+            else
+            {
+                LogArea.Text = TeamErrorC;
+            }
         }
 
         private void StopButton_OnClick(object sender, RoutedEventArgs e)
@@ -100,12 +107,15 @@
         private void ClearButton_OnClick(object sender, RoutedEventArgs e)
         {
             _battle.Clear();
+            _renderTime.Stop();
+            _renderer.Clear();
         }
 
         private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (int.TryParse(RemoveId.Text, out var removeId))
             {
+                _renderer.Remove(removeId);
                 _battle.Remove(removeId);
             }
         }
