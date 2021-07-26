@@ -9,12 +9,14 @@
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// A simple user interface with the ability to interactively add a variety
+    /// of units to an arbitrary position, determine their team affiliation.
+    /// Remove a limited unit or clear the entire field. Stop and start combat are also available.
     /// </summary>
     public partial class MainWindow
     {
-        private const string TeamErrorC = "\nYou\n cant\n start\n battle\n less \nthen\n 2\n other\n teams\n";
-        private const int BaseCounterC = 15;
+        private const string TeamErrorC = "\nYou can't start battle less then 2 other teams";
+        private const int BaseCounterC = 5;
 
         private readonly Battle _battle;
         private readonly Renderer _renderer;
@@ -27,7 +29,7 @@
             _battle = new Battle();
             _renderer = new Renderer(_battle.Warriors, BattleCanvas);
 
-            _renderTime = new Timer {Interval = 150, Enabled = true};
+            _renderTime = new Timer {Interval = 150, Enabled = false};
             _renderTime.Elapsed += RenderTimeElapsed;
         }
 

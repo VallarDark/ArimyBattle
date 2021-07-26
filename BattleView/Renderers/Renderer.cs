@@ -1,4 +1,6 @@
-﻿namespace BattleView.Renderers
+﻿using System;
+
+namespace BattleView.Renderers
 {
     using System.Collections.Generic;
     using System.Windows;
@@ -9,6 +11,11 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Linq;
+
+    /// <summary>
+    ///  draws the position of the warriors, their HP and ID.
+    /// allows you to clear the field from the graphic display of a warrior or all warriors.
+    /// </summary>
     public class Renderer
     {
         private readonly Dictionary<Warrior, List<FrameworkElement>> _renderedWarriors;
@@ -47,26 +54,23 @@
         {
             Parallel.For(0, _warriors.Count, index =>
             {
-                if (index < _warriors.Count && index > 0)
+                if (index < _warriors.Count && index >= 0)
                 {
-                    var warrior = _warriors[index];
-                    if (warrior != null)
+                    try
                     {
-                        Draw(warrior);
+                        var warrior = _warriors[index];
+                        if (warrior != null)
+                        {
+                            Draw(warrior);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
                     }
 
                 }
             });
-
-
-            //for (var index = 0; index < ; index++)
-            //{
-            //    var warrior = _warriors[index];
-            //    if (warrior != null)
-            //    {
-            //        Draw(warrior);
-            //    }
-            //}
         }
 
         public void Clear()

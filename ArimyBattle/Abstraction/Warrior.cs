@@ -212,36 +212,56 @@
 
         protected void ShortLog(Warrior warrior)
         {
-            var tempLog = $"\n id {warrior.Id} \n" +
-                          $" type {warrior.Type} \n" +
-                          $" position {warrior.Position} \n\n" +
-                          $" hp {warrior.Hp} \n\n";
+            try
+            {
+                
+                var tempLog = $"\n id {warrior.Id} \n" +
+                                          $" type {warrior.Type} \n" +
+                                          $" position {warrior.Position} \n\n" +
+                                          $" hp {warrior.Hp} \n\n";
 
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + tempLog.Length + 5);
-            _stringBuilder.Insert(_stringBuilder.Length, tempLog);
-            _logger = _stringBuilder.ToString();
-            Console.WriteLine(tempLog);
+                _stringBuilder = new StringBuilder(_logger, _logger.Length + tempLog.Length + 5);
+                _stringBuilder.Insert(_stringBuilder.Length, tempLog);
+                _logger = _stringBuilder.ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
         protected void FullLog(Warrior caster)
         {
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + caster.ToString().Length + 5);
-            _stringBuilder.Insert(_stringBuilder.Length, caster);
-            _logger = _stringBuilder.ToString();
-
-            Console.WriteLine($"{caster}");
+            try
+            {
+                _stringBuilder = new StringBuilder(_logger, _logger.Length + caster.ToString().Length + 5);
+                _stringBuilder.Insert(_stringBuilder.Length, caster);
+                _logger = _stringBuilder.ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public virtual void Attack(Warrior target)
         {
-            var damage = CalculateAttackPower(target) - target.Def;
+            try
+            {
+                var damage = CalculateAttackPower(target) - target.Def;
 
-            target.Hp -= damage;
-            ShortLog(this);
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + AttackC.Length + 5);
-            _stringBuilder.Insert(_stringBuilder.Length, AttackC);
-            _logger = _stringBuilder.ToString();
-            Console.WriteLine(AttackC);
-            ShortLog(target);
+                target.Hp -= damage;
+                ShortLog(this);
+                _stringBuilder = new StringBuilder(_logger, _logger.Length + AttackC.Length + 5);
+                _stringBuilder.Insert(_stringBuilder.Length, AttackC);
+                _logger = _stringBuilder.ToString();
+
+                ShortLog(target);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
         }
 
         public void UseSkill()
@@ -251,15 +271,21 @@
 
         public virtual void Run(Vector2 direction)
         {
-            ShortLog(this);
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + FromToC.Length + 5);
-            _stringBuilder.Insert(_stringBuilder.Length, FromToC);
-            _logger = _stringBuilder.ToString();
-            Console.WriteLine(FromToC);
+            try
+            {
+                ShortLog(this);
+                _stringBuilder = new StringBuilder(_logger, _logger.Length + FromToC.Length + 5);
+                _stringBuilder.Insert(_stringBuilder.Length, FromToC);
+                _logger = _stringBuilder.ToString();
 
-            Position += direction;
+                Position += direction;
 
-            ShortLog(this);
+                ShortLog(this);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public void Action()
@@ -271,8 +297,8 @@
                     var target = GetTarget();
                     if (target != null)
                     {
-                        Attack(target);
                         UseSkill();
+                        Attack(target);
                         HasAction = true;
                     }
                     else
@@ -314,37 +340,38 @@
                     {
                         AttackCounter = AttackResetTime;
                         HasAction = false;
+                        ResetCharacteristics();
                     }
 
                     AttackCounter--;
                 }
+                
             }
             else
             {
                 Die();
             }
         }
-
-        public virtual void Rearrangement(Warrior target)
-        {
-            var temp = Position;
-            Position = target.Position;
-            target.Position = temp;
-        }
-
         public string GetLog() => _logger;
 
         public abstract Warrior GetInstance(Warrior prototype, Vector2 position, int teamNumber);
 
         public void Die()
         {
-            Dead?.Invoke();
-            AllUnits.Remove(this);
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + DeadC.Length + 5);
-            _stringBuilder.Insert(_stringBuilder.Length, DeadC);
-            _logger = _stringBuilder.ToString();
-            Console.WriteLine(DeadC);
-            ShortLog(this);
+            try
+            {
+                Dead?.Invoke();
+                AllUnits.Remove(this);
+                _stringBuilder = new StringBuilder(_logger, _logger.Length + DeadC.Length + 5);
+                _stringBuilder.Insert(_stringBuilder.Length, DeadC);
+                _logger = _stringBuilder.ToString();
+
+                ShortLog(this);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public override string ToString()
@@ -359,7 +386,5 @@
                    $"\tattack range: {AttackRange} \n" +
                    $"\tattack reset time: {AttackResetTime} \n\n";
         }
-
-
     }
 }

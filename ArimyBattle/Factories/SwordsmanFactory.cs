@@ -15,7 +15,7 @@
                 position: new Vector2(0, 0),
                 teamNumber: 0,
                 hp: 300,
-                def: 8,
+                def: 6,
                 attackPower: 20,
                 attackRange: 10,
                 attackResetTime: 3,

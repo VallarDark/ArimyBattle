@@ -4,6 +4,5 @@
     public interface IMoveable
     {
         public void Run(Vector2 direction);
-        public void Rearrangement(Warrior target);
     }
 }

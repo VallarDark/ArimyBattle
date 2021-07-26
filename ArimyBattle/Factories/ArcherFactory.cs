@@ -16,7 +16,7 @@
                 teamNumber: 0,
                 hp: 150,
                 def: 2,
-                attackPower: 15,
+                attackPower: 18,
                 attackRange: 85,
                 attackResetTime: 2,
                 skill: new SelfHealing(),

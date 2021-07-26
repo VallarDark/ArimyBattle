@@ -10,9 +10,16 @@
     using Factories;
     using System.Text;
 
+    /// <summary>
+    /// Calculates all parameters of warriors every n seconds.
+    /// Allows you to add new instances of warriors using their factories.
+    /// Stops the fight if 1 of the teams wins.
+    /// Allows user to start and stop a battle, remove 1 or all warriors from the battle.
+    /// Logs messages from warriors.
+    /// </summary>
     public class Battle
     {
-        private const int BaseCounterC = 15;
+        private const int BaseCounterC = 5;
 
         private bool _isStarted;
         private readonly Timer _timer;
@@ -38,7 +45,7 @@
         public string GetLog() => _logger;
         public Battle()
         {
-            _timer = new Timer {Interval = 150, Enabled = true};
+            _timer = new Timer { Interval = 150, Enabled = true };
             _timer.Elapsed += StartRound;
 
             _warriors = new List<Warrior>();
@@ -46,6 +53,14 @@
             UnitInitializer();
         }
 
+
+        /// <summary>
+        /// Creates a predefined war instance and adds it to the arena
+        /// </summary>
+        /// <typeparam name="T"> Warrior factory (ArcherFactory, SwordsmanFactory..) </typeparam>
+        /// <param name="position"> spawn position of warrior</param>
+        /// <param name="teamNumber">number of team (identifies allies)</param>
+        /// <returns>link to the created warrior</returns>
         public Warrior AddWarrior<T>(Vector2 position, int teamNumber) where T : WarriorFactory
         {
             var newWarrior = _factories.FirstOrDefault(f => f.GetType() == typeof(T))?.CreateWarrior(position, teamNumber);
@@ -60,16 +75,21 @@
         private void StartRound(object s, EventArgs e)
         {
 
-            if (HasOtherTeams())
+            if (!HasOtherTeams())
             {
-
-                var first = _warriors.FirstOrDefault();
-                var msg = $"!!!!!! Win {first?.TeamNumber} team !!!!!!!!!";
-                _stringBuilder = new StringBuilder(_logger, _logger.Length + msg.Length + 5);
-                _stringBuilder.Insert(_stringBuilder.Length, msg);
-                _logger = _stringBuilder.ToString();
-                Console.WriteLine(msg);
-                Stop();
+                try
+                {
+                    var first = _warriors.FirstOrDefault();
+                    var msg = $"!!!!!! Win {first?.TeamNumber} team !!!!!!!!!";
+                    _stringBuilder = new StringBuilder(_logger, _logger.Length + msg.Length + 5);
+                    _stringBuilder.Insert(_stringBuilder.Length, msg);
+                    _logger = _stringBuilder.ToString();
+                    Stop();
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                }
             }
 
             _logger = "";
@@ -86,33 +106,21 @@
 
                         if (_counter == 0)
                         {
-                            var log = warrior.GetLog() + "\n_______________\n\n";
-                            _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length + 5);
-                            _stringBuilder.Insert(_stringBuilder.Length, log);
-                            _logger = _stringBuilder.ToString();
+                            try
+                            {
+                                var log = warrior.GetLog() + "\n_______________\n\n";
+                                _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length + 5);
+                                _stringBuilder.Insert(_stringBuilder.Length, log);
+                                _logger = _stringBuilder.ToString();
+                            }
+                            catch (Exception exception)
+                            {
+                                Console.WriteLine(exception);
+                            }
                         }
                     });
                 }
             });
-            //for (var index = 0; index < _warriors.Count; index++)
-            //{
-            //    var warrior = _warriors[index];
-            //    if (warrior != null)
-            //    {
-            //        Task.Run(() =>
-            //        {
-            //            warrior.Action();
-
-            //            if (_counter == 0)
-            //            {
-            //                var log = warrior.GetLog() + "\n_______________\n\n";
-            //                _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length + 5);
-            //                _stringBuilder.Insert(_stringBuilder.Length, log);
-            //                _logger = _stringBuilder.ToString();
-            //            }
-            //        });
-            //    }
-            //}
             _counter--;
             if (_counter < 0)
             {
@@ -125,18 +133,21 @@
             var first = _warriors.FirstOrDefault();
             if (first == null)
             {
-                return true;
+                return false;
             }
-            return _warriors.All(w => w.TeamNumber == first.TeamNumber);
+            return _warriors.Any(w => w.TeamNumber != first.TeamNumber);
         }
 
         public void Start()
         {
-            if (!_isStarted)
+            if (HasOtherTeams())
             {
-                _isStarted = true;
+                if (!_isStarted)
+                {
+                    _isStarted = true;
+                }
+                _timer.Start();
             }
-            _timer.Start();
         }
         public void Stop()
         {
