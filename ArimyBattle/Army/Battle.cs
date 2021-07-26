@@ -1,6 +1,8 @@
 ﻿
 
 
+using System.Text;
+
 namespace ArmyBattle.Army
 {
     using System.Collections.Generic;
@@ -14,14 +16,19 @@ namespace ArmyBattle.Army
 
     public class Battle
     {
-        private int _round;
+
         private bool _isStarted;
         private readonly Timer _timer;
+        private StringBuilder _stringBuilder;
 
         private readonly List<Warrior> _warriors;
         private readonly List<WarriorFactory> _factories;
 
+        private string _logger = "";
+        private int _counter = 10;
+
         public bool IsStarted => _isStarted;
+        public List<Warrior> Warriors => _warriors;
         public void UnitInitializer()
         {
             _factories.Add(new SwordsmanFactory(_warriors));
@@ -29,9 +36,9 @@ namespace ArmyBattle.Army
             _factories.Add(new LanceKnightFactory(_warriors));
         }
 
+        public string GetLog() => _logger;
         public Battle()
         {
-            _round = 1;
             _timer = new Timer();
             _warriors = new List<Warrior>();
             _factories = new List<WarriorFactory>();
@@ -69,16 +76,41 @@ namespace ArmyBattle.Army
                 Stop();
             }
 
-            Parallel.For(0, _warriors.Count, index =>
-             {
-                 if (index < _warriors.Count)
-                 {
-                     _warriors[index].Action();
-                 }
 
-             });
+            for (var index = 0; index < _warriors.Count; index++)
+            {
+                var warrior = _warriors[index];
+                if (warrior != null)
+                {
+                    Task.Run(() =>
+                {
+                    warrior.Action();
+                    if (_counter==0)
+                    {
+                        var log= warrior.GetLog()+ "\n_______________\n\n";
+                        _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length);
+                        _stringBuilder.Insert(_stringBuilder.Length, log);
+                        _logger = _stringBuilder.ToString();
+                        _counter = 15;
+                    }
 
-            Console.WriteLine($"{_round++} round");
+                    _counter--;
+                });
+                }
+
+            }
+
+            //Parallel.For(0, _warriors.Count, index =>
+            // {
+            //     if (index < _warriors.Count)
+            //     {
+            //         _warriors[index].Action();
+            //         lock (_locker)
+            //         {
+            //             _logger += _warriors[index].GetLog();
+            //         }
+            //     }
+            // });
         }
 
         private bool HasOtherTeams()
