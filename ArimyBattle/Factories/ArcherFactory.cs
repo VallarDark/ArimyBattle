@@ -14,10 +14,10 @@
                 allUnits: AllWarriors,
                 position: new Vector2(0, 0),
                 teamNumber: 0,
-                hp: 100,
+                hp: 150,
                 def: 2,
                 attackPower: 15,
-                attackRange: 5,
+                attackRange: 45,
                 attackResetTime: 2,
                 skill: new SelfHealing(),
                 dominanceWarriors: new List<Type>()

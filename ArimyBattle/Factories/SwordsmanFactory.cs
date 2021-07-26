@@ -14,10 +14,10 @@
                 allUnits: AllWarriors,
                 position: new Vector2(0, 0),
                 teamNumber: 0,
-                hp: 200,
+                hp: 300,
                 def: 8,
                 attackPower: 20,
-                attackRange: 2,
+                attackRange: 10,
                 attackResetTime: 3,
                 skill: new DefAura(AllWarriors),
                 dominanceWarriors: new List<Type>()

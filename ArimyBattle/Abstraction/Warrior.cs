@@ -170,7 +170,7 @@ namespace ArmyBattle.Abstraction
             BaseAttackRange = attackRange;
             BaseAttackResetTime = attackResetTime;
 
-            TravelDistance = 2;
+            TravelDistance = 5;
 
             AllUnits = allUnits;
             Position = position;
