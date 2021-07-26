@@ -217,7 +217,7 @@
                 
                 var tempLog = $"\n id {warrior.Id} \n" +
                                           $" type {warrior.Type} \n" +
-                                          $" position {warrior.Position} \n\n" +
+                                          $" position {warrior.Position} \n" +
                                           $" hp {warrior.Hp} \n\n";
 
                 _stringBuilder = new StringBuilder(_logger, _logger.Length + tempLog.Length + 5);

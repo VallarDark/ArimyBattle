@@ -1,4 +1,6 @@
-﻿namespace BattleView
+﻿using System;
+
+namespace BattleView
 {
     using System.Numerics;
     using ArmyBattle.Factories;
@@ -16,36 +18,37 @@
     public partial class MainWindow
     {
         private const string TeamErrorC = "\nYou can't start battle less then 2 other teams";
-        private const int BaseCounterC = 5;
+        private const int BaseCounterC = 15;
 
         private readonly Battle _battle;
         private readonly Renderer _renderer;
         private readonly Timer _renderTime;
 
         private int _counter = BaseCounterC;
+        private int _stopCounter = BaseCounterC;
         public MainWindow()
         {
             InitializeComponent();
             _battle = new Battle();
             _renderer = new Renderer(_battle.Warriors, BattleCanvas);
 
-            _renderTime = new Timer {Interval = 150, Enabled = false};
+            _renderTime = new Timer { Interval = 150, Enabled = false };
             _renderTime.Elapsed += RenderTimeElapsed;
         }
 
         private void AddButton_OnClick(object sender, RoutedEventArgs e)
         {
             var selected = Type.SelectedIndex;
-            if (selected==-1)
+            if (selected == -1)
             {
                 selected = 0;
             }
-            
+
 
             if (float.TryParse(PositionX.Text, out var positionX) && float.TryParse(PositionY.Text, out var positionY) &&
                 int.TryParse(TeamNumber.Text, out var teamNumber))
             {
-                if (teamNumber<1)
+                if (teamNumber < 1)
                 {
                     teamNumber = 1;
                 }
@@ -56,7 +59,7 @@
 
                 if (selected == 0)
                 {
-                   _battle.AddWarrior<SwordsmanFactory>(new Vector2(positionX, positionY), teamNumber);
+                    _battle.AddWarrior<SwordsmanFactory>(new Vector2(positionX, positionY), teamNumber);
                 }
                 else if (selected == 1)
                 {
@@ -75,13 +78,30 @@
         {
             Task.Run(() =>
             {
-                _renderer.Render();
-                if (_counter==0)
+                try
                 {
-                    Dispatcher.Invoke(() => { LogArea.Text = _battle.GetLog(); });
-                    _counter = BaseCounterC;
+                    if (!_battle.IsStarted)
+                    {
+                        if (_stopCounter==0)
+                        {
+                            _renderTime.Stop();
+                            _stopCounter = BaseCounterC;
+                        }
+                        
+                        _stopCounter--;
+                    }
+                    _renderer.Render();
+                    if (_counter == 0)
+                    {
+                        Dispatcher.Invoke(() => { LogArea.Text = _battle.GetLog(); });
+                        _counter = BaseCounterC;
+                    }
+                    _counter--;
                 }
-                _counter--;
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                }
             });
         }
 

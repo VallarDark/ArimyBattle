@@ -19,7 +19,7 @@
     /// </summary>
     public class Battle
     {
-        private const int BaseCounterC = 5;
+        private const int BaseCounterC = 15;
 
         private bool _isStarted;
         private readonly Timer _timer;
@@ -80,10 +80,7 @@
                 try
                 {
                     var first = _warriors.FirstOrDefault();
-                    var msg = $"!!!!!! Win {first?.TeamNumber} team !!!!!!!!!";
-                    _stringBuilder = new StringBuilder(_logger, _logger.Length + msg.Length + 5);
-                    _stringBuilder.Insert(_stringBuilder.Length, msg);
-                    _logger = _stringBuilder.ToString();
+                    _logger  = $"!!!!!! Win {first?.TeamNumber} team !!!!!!!!!";
                     Stop();
                 }
                 catch (Exception exception)
@@ -92,34 +89,44 @@
                 }
             }
 
-            _logger = "";
-
 
             Parallel.For(0, _warriors.Count, index =>
             {
-                var warrior = _warriors[index];
-                if (warrior != null)
+                if (index >= 0 && index < _warriors.Count)
                 {
-                    Task.Run(() =>
+                    try
                     {
-                        warrior.Action();
-
-                        if (_counter == 0)
+                        var warrior = _warriors[index];
+                        if (warrior != null)
                         {
-                            try
+                            warrior.Action();
+
+                            if (_counter == 0)
                             {
-                                var log = warrior.GetLog() + "\n_______________\n\n";
-                                _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length + 5);
-                                _stringBuilder.Insert(_stringBuilder.Length, log);
-                                _logger = _stringBuilder.ToString();
+                                try
+                                {
+                                    var log = warrior.GetLog() + "\n_______________\n\n";
+                                    _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length + 5);
+                                    _stringBuilder.Insert(_stringBuilder.Length, log);
+                                    _logger = _stringBuilder.ToString();
+                                }
+                                catch (Exception exception)
+                                {
+                                    Console.WriteLine(exception);
+                                }
                             }
-                            catch (Exception exception)
+                            else if (_counter == 1)
                             {
-                                Console.WriteLine(exception);
+                                _logger = "";
                             }
                         }
-                    });
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception);
+                    }
                 }
+
             });
             _counter--;
             if (_counter < 0)
