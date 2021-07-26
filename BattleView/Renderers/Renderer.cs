@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace BattleView.Renderers
+﻿namespace BattleView.Renderers
 {
     using System.Collections.Generic;
     using System.Windows;
@@ -10,6 +8,7 @@ namespace BattleView.Renderers
     using ArmyBattle.Abstraction;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Linq;
     public class Renderer
     {
         private readonly Dictionary<Warrior, List<FrameworkElement>> _renderedWarriors;
@@ -46,14 +45,28 @@ namespace BattleView.Renderers
         }
         public void Render()
         {
-            for (var index = 0; index < _warriors.Count; index++)
+            Parallel.For(0, _warriors.Count, index =>
             {
-                var warrior = _warriors[index];
-                if (warrior != null)
+                if (index < _warriors.Count && index > 0)
                 {
-                    Draw(warrior);
+                    var warrior = _warriors[index];
+                    if (warrior != null)
+                    {
+                        Draw(warrior);
+                    }
+
                 }
-            }
+            });
+
+
+            //for (var index = 0; index < ; index++)
+            //{
+            //    var warrior = _warriors[index];
+            //    if (warrior != null)
+            //    {
+            //        Draw(warrior);
+            //    }
+            //}
         }
 
         public void Clear()
@@ -64,8 +77,8 @@ namespace BattleView.Renderers
 
         public void Remove(int id)
         {
-            var warrior=_warriors.FirstOrDefault(w => w.Id == id);
-            if (warrior!= null)
+            var warrior = _warriors.FirstOrDefault(w => w.Id == id);
+            if (warrior != null)
             {
                 var children = _renderedWarriors[warrior];
                 foreach (var child in children)
@@ -118,12 +131,12 @@ namespace BattleView.Renderers
             circle.SetValue(Canvas.TopProperty, (double)warrior.Position.Y);
 
 
-            TextBlock idBlock = new TextBlock {Text = $"id: {warrior.Id}"};
+            TextBlock idBlock = new TextBlock { Text = $"id: {warrior.Id}" };
             idBlock.SetValue(Canvas.LeftProperty, (double)warrior.Position.X - 25);
             idBlock.SetValue(Canvas.TopProperty, (double)warrior.Position.Y - 15);
 
 
-            TextBlock hpBlock = new TextBlock {Text = $"hp: {warrior.Hp}"};
+            TextBlock hpBlock = new TextBlock { Text = $"hp: {warrior.Hp}" };
             hpBlock.SetValue(Canvas.LeftProperty, (double)warrior.Position.X + 15);
             hpBlock.SetValue(Canvas.TopProperty, (double)warrior.Position.Y - 15);
 
@@ -139,9 +152,16 @@ namespace BattleView.Renderers
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        circle.Fill = Brushes.GhostWhite;
-                        circle.Stroke = Brushes.LightGray;
-                        Thread.Sleep(1800);
+                        Task.Run(() =>
+                        {
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                circle.Fill = Brushes.Black;
+                                circle.Stroke = Brushes.Black;
+                            });
+                        });
+
+                        Thread.Sleep(800);
                         _canvas.Children.Remove(circle);
                         _canvas.Children.Remove(idBlock);
                         _canvas.Children.Remove(hpBlock);

@@ -3,7 +3,6 @@
     using System.Numerics;
     using ArmyBattle.Factories;
     using System.Windows;
-    using System.Windows.Controls;
     using ArmyBattle.Army;
     using System.Timers;
     using Renderers;
@@ -14,23 +13,22 @@
     /// </summary>
     public partial class MainWindow
     {
-        private const string TeamErrorC = "You cant start battle less then 2 other teams";
+        private const string TeamErrorC = "\nYou\n cant\n start\n battle\n less \nthen\n 2\n other\n teams\n";
+        private const int BaseCounterC = 15;
 
         private readonly Battle _battle;
         private readonly Renderer _renderer;
         private readonly Timer _renderTime;
 
-        private int _counter = 10;
+        private int _counter = BaseCounterC;
         public MainWindow()
         {
             InitializeComponent();
             _battle = new Battle();
-            Type.SelectionMode = SelectionMode.Single;
             _renderer = new Renderer(_battle.Warriors, BattleCanvas);
 
-            _renderTime = new Timer { Interval = 500 };
+            _renderTime = new Timer {Interval = 150, Enabled = true};
             _renderTime.Elapsed += RenderTimeElapsed;
-            _renderTime.Enabled = true;
         }
 
         private void AddButton_OnClick(object sender, RoutedEventArgs e)
@@ -79,7 +77,7 @@
                 if (_counter==0)
                 {
                     Dispatcher.Invoke(() => { LogArea.Text = _battle.GetLog(); });
-                    _counter = 15;
+                    _counter = BaseCounterC;
                 }
                 _counter--;
             });
@@ -94,7 +92,10 @@
             }
             else
             {
-                LogArea.Text = TeamErrorC;
+                Dispatcher.Invoke(() =>
+                {
+                    LogArea.Text = TeamErrorC;
+                });
             }
         }
 

@@ -15,7 +15,7 @@
 
         private StringBuilder _stringBuilder;
         private static int _counter = 1;
-        private string _logger="";
+        private string _logger = "";
 
         protected Random Random;
 
@@ -169,7 +169,7 @@
             BaseAttackRange = attackRange;
             BaseAttackResetTime = attackResetTime;
 
-            TravelDistance = 5;
+            TravelDistance = 3;
 
             AllUnits = allUnits;
             Position = position;
@@ -190,11 +190,11 @@
             var currentAttackPower = AttackPower;
             if (DominanceWarriors.Contains(target.GetType()))
             {
-                currentAttackPower = (int)(currentAttackPower * 0.25f);
+                currentAttackPower = (int)(currentAttackPower / 0.25f);
             }
             else if (SuppressionWarriors.Contains(target.GetType()))
             {
-                currentAttackPower = (int)(currentAttackPower / 0.25f);
+                currentAttackPower = (int)(currentAttackPower * 0.25f);
             }
 
             return currentAttackPower;
@@ -214,16 +214,17 @@
         {
             var tempLog = $"\n id {warrior.Id} \n" +
                           $" type {warrior.Type} \n" +
-                          $" position {warrior.Position} \n\n";
+                          $" position {warrior.Position} \n\n" +
+                          $" hp {warrior.Hp} \n\n";
 
-            _stringBuilder = new StringBuilder(_logger, _logger.Length+ tempLog.Length);
+            _stringBuilder = new StringBuilder(_logger, _logger.Length + tempLog.Length + 5);
             _stringBuilder.Insert(_stringBuilder.Length, tempLog);
             _logger = _stringBuilder.ToString();
             Console.WriteLine(tempLog);
         }
-        protected void Log(Warrior caster)
+        protected void FullLog(Warrior caster)
         {
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + caster.ToString().Length);
+            _stringBuilder = new StringBuilder(_logger, _logger.Length + caster.ToString().Length + 5);
             _stringBuilder.Insert(_stringBuilder.Length, caster);
             _logger = _stringBuilder.ToString();
 
@@ -236,11 +237,11 @@
 
             target.Hp -= damage;
             ShortLog(this);
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + AttackC.Length);
+            _stringBuilder = new StringBuilder(_logger, _logger.Length + AttackC.Length + 5);
             _stringBuilder.Insert(_stringBuilder.Length, AttackC);
             _logger = _stringBuilder.ToString();
             Console.WriteLine(AttackC);
-            Log(target);
+            ShortLog(target);
         }
 
         public void UseSkill()
@@ -251,7 +252,7 @@
         public virtual void Run(Vector2 direction)
         {
             ShortLog(this);
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + FromToC.Length);
+            _stringBuilder = new StringBuilder(_logger, _logger.Length + FromToC.Length + 5);
             _stringBuilder.Insert(_stringBuilder.Length, FromToC);
             _logger = _stringBuilder.ToString();
             Console.WriteLine(FromToC);
@@ -339,7 +340,7 @@
         {
             Dead?.Invoke();
             AllUnits.Remove(this);
-            _stringBuilder = new StringBuilder(_logger, _logger.Length + DeadC.Length);
+            _stringBuilder = new StringBuilder(_logger, _logger.Length + DeadC.Length + 5);
             _stringBuilder.Insert(_stringBuilder.Length, DeadC);
             _logger = _stringBuilder.ToString();
             Console.WriteLine(DeadC);

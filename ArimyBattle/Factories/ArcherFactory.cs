@@ -17,7 +17,7 @@
                 hp: 150,
                 def: 2,
                 attackPower: 15,
-                attackRange: 45,
+                attackRange: 85,
                 attackResetTime: 2,
                 skill: new SelfHealing(),
                 dominanceWarriors: new List<Type>()

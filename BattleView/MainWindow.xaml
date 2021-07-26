@@ -64,7 +64,7 @@
             </ScrollViewer>
             
             <Label Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2" Margin="10,0,10,0" Content="Type" />
-            <ListBox Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" x:Name="Type" Margin="10,5,10,5" >
+            <ListBox SelectionMode="Single" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" x:Name="Type" Margin="10,5,10,5" >
 
                 <ListBoxItem Content = "Swordsman" />
                 <ListBoxItem Content = "LanceKnight" />

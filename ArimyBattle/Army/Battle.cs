@@ -12,6 +12,7 @@
 
     public class Battle
     {
+        private const int BaseCounterC = 15;
 
         private bool _isStarted;
         private readonly Timer _timer;
@@ -20,8 +21,10 @@
         private readonly List<Warrior> _warriors;
         private readonly List<WarriorFactory> _factories;
 
-        private string _logger;
-        private int _counter = 10;
+        private string _logger = "";
+
+
+        private int _counter = BaseCounterC;
 
         public bool IsStarted => _isStarted;
         public List<Warrior> Warriors => _warriors;
@@ -35,7 +38,9 @@
         public string GetLog() => _logger;
         public Battle()
         {
-            _timer = new Timer();
+            _timer = new Timer {Interval = 150, Enabled = true};
+            _timer.Elapsed += StartRound;
+
             _warriors = new List<Warrior>();
             _factories = new List<WarriorFactory>();
             UnitInitializer();
@@ -57,10 +62,10 @@
 
             if (HasOtherTeams())
             {
-                
-                var first=_warriors.FirstOrDefault();
+
+                var first = _warriors.FirstOrDefault();
                 var msg = $"!!!!!! Win {first?.TeamNumber} team !!!!!!!!!";
-                _stringBuilder = new StringBuilder(_logger, _logger.Length + msg.Length);
+                _stringBuilder = new StringBuilder(_logger, _logger.Length + msg.Length + 5);
                 _stringBuilder.Insert(_stringBuilder.Length, msg);
                 _logger = _stringBuilder.ToString();
                 Console.WriteLine(msg);
@@ -68,26 +73,50 @@
             }
 
             _logger = "";
-            for (var index = 0; index < _warriors.Count; index++)
+
+
+            Parallel.For(0, _warriors.Count, index =>
             {
                 var warrior = _warriors[index];
                 if (warrior != null)
                 {
                     Task.Run(() =>
-                {
-                    warrior.Action();
-                    if (_counter==0)
                     {
-                        var log= warrior.GetLog()+ "\n_______________\n\n";
-                        _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length);
-                        _stringBuilder.Insert(_stringBuilder.Length, log);
-                        _logger = _stringBuilder.ToString();
-                        _counter = 15;
-                    }
+                        warrior.Action();
 
-                    _counter--;
-                });
+                        if (_counter == 0)
+                        {
+                            var log = warrior.GetLog() + "\n_______________\n\n";
+                            _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length + 5);
+                            _stringBuilder.Insert(_stringBuilder.Length, log);
+                            _logger = _stringBuilder.ToString();
+                        }
+                    });
                 }
+            });
+            //for (var index = 0; index < _warriors.Count; index++)
+            //{
+            //    var warrior = _warriors[index];
+            //    if (warrior != null)
+            //    {
+            //        Task.Run(() =>
+            //        {
+            //            warrior.Action();
+
+            //            if (_counter == 0)
+            //            {
+            //                var log = warrior.GetLog() + "\n_______________\n\n";
+            //                _stringBuilder = new StringBuilder(_logger, _logger.Length + log.Length + 5);
+            //                _stringBuilder.Insert(_stringBuilder.Length, log);
+            //                _logger = _stringBuilder.ToString();
+            //            }
+            //        });
+            //    }
+            //}
+            _counter--;
+            if (_counter < 0)
+            {
+                _counter = BaseCounterC;
             }
         }
 
@@ -107,9 +136,6 @@
             {
                 _isStarted = true;
             }
-            _timer.Interval = 500;
-            _timer.Enabled = true;
-            _timer.Elapsed += StartRound;
             _timer.Start();
         }
         public void Stop()
