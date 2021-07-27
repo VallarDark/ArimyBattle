@@ -2,6 +2,10 @@
 {
     using Abstraction;
     using System.Collections.Generic;
+
+    /// <summary>
+    /// Periodically removes all effects from other target.
+    /// </summary>
     public class SingleCleanup : StrangerSkill
     {
         public SingleCleanup( List<Warrior> targets, ISkill innerSkill = null) : base(targets,
@@ -9,6 +13,7 @@
         {
             RollbackTime = 3;
             CastTime = 2;
+            Range = 20;
 
             ActionType = ActionTypeEnum.Buff;
             CountType = CountTypeEnum.Single;

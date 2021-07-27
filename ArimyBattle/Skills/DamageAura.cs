@@ -4,13 +4,20 @@
     using System.Collections.Generic;
     using System;
 
+    /// <summary>
+    ///  Deals periodic damage to enemies within a radius of the target.
+    /// </summary>
     public class DamageAura : StrangerSkill
     {
+
+        /// <param name="targets"> List of all warriors in battle</param>
+        /// <param name="innerSkill">An internal skill that will also be applied.</param>
         public DamageAura( List<Warrior> targets, ISkill innerSkill = null) : base( targets, innerSkill)
         {
             Strange = 5;
             RollbackTime = 3;
             CastTime = 2;
+            Range = 20;
 
             ActionType = ActionTypeEnum.Debuff;
             CountType = CountTypeEnum.Many;
@@ -26,7 +33,6 @@
             }
             Console.WriteLine($"Target:\n{target}");
         }
-
         protected override void SkillLogic(Warrior caster)
         {
             foreach (var target in GetTarget(caster))

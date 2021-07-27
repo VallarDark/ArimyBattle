@@ -10,7 +10,11 @@
         private const string AttackC = "_____Attack_____";
         private const string FromToC = "from____Run____to";
         private const string DeadC = "____Dead____";
+
         public delegate void DeadDelegate();
+        /// <summary>
+        /// Execute the passed code when the warrior dies.
+        /// </summary>
         public event DeadDelegate Dead;
 
         private StringBuilder _stringBuilder;
@@ -31,6 +35,13 @@
         protected readonly int BaseAttackRange;
         protected readonly int BaseAttackResetTime;
         protected readonly int BaseTeamNumber;
+
+        public  int GetBaseHp=>BaseHp;
+        public  int GetBaseDef=>BaseDef;
+        public  int GetBaseAttackPower=>BaseAttackPower;
+        public  int GetBaseAttackRange=>BaseAttackRange;
+        public  int GetBaseAttackResetTime=>BaseAttackResetTime;
+        public  int GetBaseTeamNumber=>BaseTeamNumber;
 
         protected int InnerHp;
         protected int InnerDef;
@@ -112,13 +123,13 @@
         }
 
         public Vector2 Position { get; set; }
-        public string Type => GetType().Name;
+        public string TroopsType => GetType().Name;
         public List<Warrior> AllUnits { get; protected set; }
         public ISkill Skill { get; protected set; }
         public List<Type> DominanceWarriors { get; protected set; }
         public List<Type> SuppressionWarriors { get; protected set; }
 
-        public void ResetHp()
+        protected void ResetHp()
         {
             Hp = BaseHp;
         }
@@ -148,6 +159,9 @@
             TeamNumber = BaseTeamNumber;
         }
 
+        /// <summary>
+        /// Clear all negative effects. Can be used in skill.
+        /// </summary>
         public void ResetCharacteristics()
         {
             ResetDef();
@@ -214,9 +228,9 @@
         {
             try
             {
-                
+
                 var tempLog = $"\n id {warrior.Id} \n" +
-                                          $" type {warrior.Type} \n" +
+                                          $" type {warrior.TroopsType} \n" +
                                           $" position {warrior.Position} \n" +
                                           $" hp {warrior.Hp} \n\n";
 
@@ -229,6 +243,7 @@
                 Console.WriteLine(e);
             }
         }
+
         protected void FullLog(Warrior caster)
         {
             try
@@ -243,25 +258,30 @@
             }
         }
 
+        /// <summary>
+        /// Reduces the enemy's HP if he is in the attack zone.
+        /// </summary>
+        /// <param name="target"> Other warrior as target for attack. </param>
         public virtual void Attack(Warrior target)
         {
-            try
+            if (Vector2.Distance(Position, target.Position) <= AttackRange)
             {
-                var damage = CalculateAttackPower(target) - target.Def;
+                try
+                {
+                    var damage = CalculateAttackPower(target) - target.Def;
+                    target.Hp -= damage;
+                    ShortLog(this);
+                    _stringBuilder = new StringBuilder(_logger, _logger.Length + AttackC.Length + 5);
+                    _stringBuilder.Insert(_stringBuilder.Length, AttackC);
+                    _logger = _stringBuilder.ToString();
 
-                target.Hp -= damage;
-                ShortLog(this);
-                _stringBuilder = new StringBuilder(_logger, _logger.Length + AttackC.Length + 5);
-                _stringBuilder.Insert(_stringBuilder.Length, AttackC);
-                _logger = _stringBuilder.ToString();
-
-                ShortLog(target);
+                    ShortLog(target);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
         }
 
         public void UseSkill()
@@ -269,6 +289,10 @@
             Skill.UseSkill(this);
         }
 
+        /// <summary>
+        /// Runs in a straight line with the specified end point for the maximum travel distance.
+        /// </summary>
+        /// <param name="direction"> Direction of travel</param>
         public virtual void Run(Vector2 direction)
         {
             try
@@ -288,6 +312,9 @@
             }
         }
 
+        /// <summary>
+        /// Challenge the warrior's inner logic. Includes attack, movement and challenge ability.
+        /// </summary>
         public void Action()
         {
             if (IsAlive)
@@ -345,15 +372,27 @@
 
                     AttackCounter--;
                 }
-                
+
             }
             else
             {
                 Die();
             }
         }
+
+        /// <summary>
+        /// The log contains messages about all actions of the warrior.
+        /// </summary>
+        /// <returns> Event log up to the current moment</returns>
         public string GetLog() => _logger;
 
+        /// <summary>
+        /// Creates a clone of a warrior based on the prototype with the specified position and team number.
+        /// </summary>
+        /// <param name="prototype">Warrior prototype to copy</param>
+        /// <param name="position">New position</param>
+        /// <param name="teamNumber">New team number</param>
+        /// <returns>A new warrior with a copy of the characteristics and skills of the prototype</returns>
         public abstract Warrior GetInstance(Warrior prototype, Vector2 position, int teamNumber);
 
         public void Die()
@@ -377,7 +416,7 @@
         public override string ToString()
         {
             return $"\n\tid: {Id} \n" +
-                   $"\ttype: {Type} \n" +
+                   $"\ttype: {TroopsType} \n" +
                    $"\thp: {Hp} \n" +
                    $"\tdef: {Def}\n" +
                    $"\tposition: {Position.X},{Position.Y} \n" +

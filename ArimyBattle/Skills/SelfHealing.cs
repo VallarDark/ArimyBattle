@@ -2,6 +2,10 @@
 {
     using Abstraction;
     using System;
+
+    /// <summary>
+    /// Periodically increases its own HP.
+    /// </summary>
     public class SelfHealing : SelfSkill
     {
         public SelfHealing(ISkill innerSkill = null) : base(innerSkill)

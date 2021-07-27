@@ -128,7 +128,7 @@ namespace BattleView.Renderers
                 Width = _radius,
                 Height = _radius,
                 StrokeThickness = 3,
-                Fill = _typeColors[warrior.Type],
+                Fill = _typeColors[warrior.TroopsType],
                 Stroke = _teamColors[warrior.TeamNumber]
             };
             circle.SetValue(Canvas.LeftProperty, (double)warrior.Position.X);

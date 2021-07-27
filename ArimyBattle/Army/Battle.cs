@@ -156,16 +156,29 @@
                 _timer.Start();
             }
         }
+
+        /// <summary>
+        /// Stops the fight timer.
+        /// </summary>
         public void Stop()
         {
             _timer.Stop();
             _isStarted = false;
         }
+
+        /// <summary>
+        /// Stops the combat timer and removes all warriors from the battle.
+        /// </summary>
         public void Clear()
         {
             _timer.Stop();
             _warriors.Clear();
         }
+
+        /// <summary>
+        /// Removes a warrior from combat, if one exists, without stopping the timer.
+        /// </summary>
+        /// <param name="id">Warrior id</param>
         public void Remove(int id)
         {
             var warrior = _warriors.FirstOrDefault(w => w.Id == id);

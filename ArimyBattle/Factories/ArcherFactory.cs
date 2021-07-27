@@ -31,7 +31,7 @@
                 );
         }
 
-        public ArcherFactory(List<Warrior> allWarriors) : base(allWarriors)
+        public ArcherFactory(List<Warrior> allWarriors=null) : base(allWarriors)
         {
         }
     }

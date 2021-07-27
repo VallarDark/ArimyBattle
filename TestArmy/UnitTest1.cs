@@ -51,5 +51,69 @@ namespace TestArmy
             Assert.Equal(resultWarrior.Position, testWarrior.Position);
         }
 
+        [Fact]
+        public void DefAuraTest()
+        {
+            var allWarriors = new List<Warrior>();
+            var factory = new ArcherFactory(allWarriors);
+            var defAura = new DefAura(allWarriors);
+
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            allWarriors.Add(factory.CreateWarrior(Vector2.One, 2));
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            allWarriors.Add(factory.CreateWarrior(new Vector2(0,5), 2));
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            var caster = allWarriors.First();
+
+            Assert.All(allWarriors.Skip(1).Where(w => Vector2.Distance(w.Position, caster.Position) <= defAura.GetRange && w.TeamNumber==caster.TeamNumber), w => Assert.Equal(w.Def, w.GetBaseDef));
+
+            defAura.UseSkill(caster);
+
+            Assert.All(allWarriors.Skip(1).Where(w=>Vector2.Distance(w.Position,caster.Position)<=defAura.GetRange && w.TeamNumber == caster.TeamNumber),w=>Assert.NotEqual(w.Def,w.GetBaseDef));
+
+        }
+
+        [Fact]
+        public void DamageAuraTest()
+        {
+            var allWarriors = new List<Warrior>();
+            var factory = new ArcherFactory(allWarriors);
+            var damageAura= new DamageAura(allWarriors);
+
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            allWarriors.Add(factory.CreateWarrior(Vector2.One, 3));
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            allWarriors.Add(factory.CreateWarrior(new Vector2(0, 5), 3));
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 3));
+            allWarriors.Add(factory.CreateWarrior(Vector2.Zero, 2));
+            var caster = allWarriors.First();
+
+            Assert.All(allWarriors.Skip(1).Where(w => Vector2.Distance(w.Position, caster.Position) <= damageAura.GetRange && w.TeamNumber != caster.TeamNumber), w => Assert.Equal(w.Hp, w.GetBaseHp));
+
+            damageAura.UseSkill(caster);
+
+            Assert.All(allWarriors.Skip(1).Where(w => Vector2.Distance(w.Position, caster.Position) <= damageAura.GetRange && w.TeamNumber != caster.TeamNumber), w => Assert.NotEqual(w.Hp, w.GetBaseHp));
+        }
+
+        [Fact]
+        public void SelfHealTest()
+        {
+            var factory = new ArcherFactory();
+            var selfHealing = new SelfHealing();
+
+            var caster = factory.CreateWarrior(Vector2.Zero, 3);
+            caster.Hp -= 20;
+
+            Assert.NotEqual(caster.Hp,caster.GetBaseHp);
+            for (int i = 0; i < 50; i++)
+            {
+                selfHealing.UseSkill(caster);
+            }
+
+            Assert.Equal(caster.Hp, caster.GetBaseHp);
+        }
     }
 }

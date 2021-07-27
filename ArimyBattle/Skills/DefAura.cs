@@ -4,6 +4,9 @@
     using System.Collections.Generic;
     using System;
 
+    /// <summary>
+    ///  Periodically increases the defense of allies within the target's radius.
+    /// </summary>
     public class DefAura:StrangerSkill
     {
         public DefAura(List<Warrior> targets, ISkill innerSkill = null) : base(targets, innerSkill)
@@ -11,6 +14,7 @@
             Strange = 5;
             RollbackTime = 3;
             CastTime = 2;
+            Range = 20;
 
             ActionType = ActionTypeEnum.Buff;
             CountType = CountTypeEnum.Many;

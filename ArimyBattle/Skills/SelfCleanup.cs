@@ -2,6 +2,10 @@
 {
     using Abstraction;
     using System;
+
+    /// <summary>
+    /// Periodically removes all effects from itself.
+    /// </summary>
     public class SelfCleanup : SelfSkill
     {
         public SelfCleanup(ISkill innerSkill = null) : base(innerSkill)

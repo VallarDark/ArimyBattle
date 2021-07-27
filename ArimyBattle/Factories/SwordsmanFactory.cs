@@ -31,7 +31,7 @@
                 );
         }
 
-        public SwordsmanFactory(List<Warrior> allWarriors) : base(allWarriors)
+        public SwordsmanFactory(List<Warrior> allWarriors = null) : base(allWarriors)
         {
         }
     }

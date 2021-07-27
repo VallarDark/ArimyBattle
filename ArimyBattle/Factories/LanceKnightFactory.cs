@@ -31,7 +31,7 @@
                 );
         }
 
-        public LanceKnightFactory(List<Warrior> allWarriors) : base(allWarriors)
+        public LanceKnightFactory(List<Warrior> allWarriors = null) : base(allWarriors)
         {
         }
     }
