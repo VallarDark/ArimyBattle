@@ -54,26 +54,24 @@
         public int TeamNumber
         {
             get => InnerTeamNumber;
-            set
-            {
-                if (value >= 0)
-                {
-                    InnerTeamNumber = value;
-                }
-            }
+            set => InnerTeamNumber = value >= 0 ? value : 0;
         }
         public int Hp
         {
             get => InnerHp;
             set
             {
-                if (value <= BaseHp)
+                if (value <= BaseHp && value>=0)
                 {
-                    if (value < 0)
-                    {
-                        value = 0;
-                    }
                     InnerHp = value;
+                }
+                else if (value<0)
+                {
+                    InnerHp = 0;
+                }
+                else
+                {
+                    InnerHp = BaseHp;
                 }
             }
         }

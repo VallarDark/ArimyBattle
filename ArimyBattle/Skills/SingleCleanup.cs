@@ -8,13 +8,9 @@
     /// </summary>
     public class SingleCleanup : StrangerSkill
     {
-        public SingleCleanup( List<Warrior> targets, ISkill innerSkill = null) : base(targets,
-            innerSkill)
+        public SingleCleanup( List<Warrior> targets, ISkill innerSkill = null, int rollbackTime = 3, int castTime = 2, int strange = 0, int range = 20) :
+            base(targets, innerSkill,rollbackTime, castTime, strange, range)
         {
-            RollbackTime = 3;
-            CastTime = 2;
-            Range = 20;
-
             ActionType = ActionTypeEnum.Buff;
             CountType = CountTypeEnum.Single;
         }

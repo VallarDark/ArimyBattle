@@ -14,9 +14,16 @@
         protected int RollbackCounter;
         protected int CastCounter;
 
-        protected SelfSkill(ISkill innerSkill = null)
+        /// <param name="innerSkill"> Internal skill that will also be performed </param>
+        /// <param name="rollbackTime"> Ability cooldown </param>
+        /// <param name="castTime"> Casting time of the ability </param>
+        /// <param name="strange"> Power of ability </param>
+        protected SelfSkill(ISkill innerSkill = null, int rollbackTime = 3, int castTime = 2, int strange = 3)
         {
             InnerSkill = innerSkill;
+            Strange = strange;
+            RollbackTime = rollbackTime;
+            CastTime = castTime;
         }
 
         protected virtual void Log(Warrior caster, Warrior target = null)

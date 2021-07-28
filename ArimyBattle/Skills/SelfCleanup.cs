@@ -8,10 +8,8 @@
     /// </summary>
     public class SelfCleanup : SelfSkill
     {
-        public SelfCleanup(ISkill innerSkill = null) : base(innerSkill)
+        public SelfCleanup(ISkill innerSkill = null, int rollbackTime = 3, int castTime = 2, int strange = 10) : base(innerSkill,rollbackTime, castTime, strange)
         {
-            RollbackTime = 3;
-            CastTime = 2;
         }
 
         protected override void Log(Warrior caster, Warrior target = null)

@@ -8,11 +8,8 @@
     /// </summary>
     public class SelfHealing : SelfSkill
     {
-        public SelfHealing(ISkill innerSkill = null) : base(innerSkill)
+        public SelfHealing(ISkill innerSkill = null, int rollbackTime = 3, int castTime = 2, int strange=10) : base(innerSkill,rollbackTime, castTime, strange)
         {
-            Strange = 10;
-            RollbackTime = 3;
-            CastTime = 2;
         }
 
         protected override void Log(Warrior caster, Warrior target = null)

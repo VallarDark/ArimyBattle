@@ -52,10 +52,21 @@
         public int GetRange => Range;
         public int GetStrange => Strange;
 
-        protected StrangerSkill(List<Warrior> targets, ISkill innerSkill = null)
+
+        /// <param name="targets"> All warriors in the battle </param>
+        /// <param name="innerSkill"> Internal skill that will also be performed </param>
+        /// <param name="rollbackTime"> Ability cooldown </param>
+        /// <param name="castTime"> Casting time of the ability </param>
+        /// <param name="strange"> Power of ability </param>
+        /// <param name="range"> Ability Coverage Radius </param>
+        protected StrangerSkill(List<Warrior> targets, ISkill innerSkill = null,int rollbackTime = 3, int castTime = 2, int strange = 5, int range = 20)
         {
             Targets = targets;
             InnerSkill = innerSkill;
+            Strange = strange;
+            RollbackTime = rollbackTime;
+            CastTime = castTime;
+            Range = range;
         }
 
         protected virtual void Log(Warrior caster, Warrior target = null)

@@ -9,16 +9,8 @@
     /// </summary>
     public class DamageAura : StrangerSkill
     {
-
-        /// <param name="targets"> List of all warriors in battle</param>
-        /// <param name="innerSkill">An internal skill that will also be applied.</param>
-        public DamageAura( List<Warrior> targets, ISkill innerSkill = null) : base( targets, innerSkill)
+        public DamageAura( List<Warrior> targets, ISkill innerSkill = null,int rollbackTime = 3, int castTime = 2, int strange = 5,int range=20) : base( targets, innerSkill, rollbackTime, castTime, strange, range)
         {
-            Strange = 5;
-            RollbackTime = 3;
-            CastTime = 2;
-            Range = 20;
-
             ActionType = ActionTypeEnum.Debuff;
             CountType = CountTypeEnum.Many;
         }
